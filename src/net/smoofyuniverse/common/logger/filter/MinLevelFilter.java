@@ -34,8 +34,9 @@ public class MinLevelFilter implements LogFilter {
 		return Optional.ofNullable(this.level);
 	}
 
-	public void setMinLevel(LogLevel l) {
+	public MinLevelFilter setMinLevel(LogLevel l) {
 		this.level = l;
+		return this;
 	}
 
 	@Override

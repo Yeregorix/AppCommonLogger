@@ -24,17 +24,30 @@ package net.smoofyuniverse.common.logger.core;
 
 import net.smoofyuniverse.common.logger.appender.LogAppender;
 
-import java.util.Collection;
+import java.util.Collections;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class LoggerFactory {
-	private Map<String, Logger> loggers = new ConcurrentHashMap<>();
+	private Map<String, Logger> loggers = new ConcurrentHashMap<>(), unmodifiableLoggers = Collections.unmodifiableMap(this.loggers);
+	private LogLevel level = LogLevel.TRACE;
 	private LogAppender appender;
 
 	public LoggerFactory(LogAppender appender) {
 		this.appender = appender;
+	}
+
+	public LogLevel getLevel() {
+		return this.level;
+	}
+
+	public void setLevel(LogLevel level) {
+		this.level = level;
+	}
+
+	public boolean isActive(LogLevel level) {
+		return level.ordinal() >= this.level.ordinal();
 	}
 
 	public LogAppender getAppender() {
@@ -54,7 +67,7 @@ public class LoggerFactory {
 		return Optional.ofNullable(this.loggers.get(name));
 	}
 
-	public Collection<Logger> getLoggers() {
-		return this.loggers.values();
+	public Map<String, Logger> getLoggers() {
+		return this.unmodifiableLoggers;
 	}
 }

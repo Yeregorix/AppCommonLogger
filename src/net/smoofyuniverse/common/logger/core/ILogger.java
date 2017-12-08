@@ -28,30 +28,40 @@ public interface ILogger {
 
 	public String getName();
 
-	public default void trace(String text) {
-		log(LogLevel.TRACE, text);
+	public boolean isActive(LogLevel level);
+
+	public default void log(LogLevel level, Thread thread, String text, Throwable throwable) {
+		log(new LogMessage(level, this, thread, text), throwable);
 	}
 
 	public default void log(LogLevel level, String text) {
 		log(new LogMessage(level, this, text), null);
 	}
 
+	public default void log(LogLevel level, Throwable throwable) {
+		log(new LogMessage(level, this, "An error occurred."), throwable);
+	}
+
+	public default void log(LogLevel level, String text, Throwable throwable) {
+		log(new LogMessage(level, this, text), throwable);
+	}
+
 	public void log(LogMessage msg, Throwable throwable);
+
+	public default void log(LocalTime time, LogLevel level, Thread thread, String text, Throwable throwable) {
+		log(new LogMessage(time, level, this, thread, text), throwable);
+	}
+
+	public default void trace(String text) {
+		log(LogLevel.TRACE, text);
+	}
 
 	public default void trace(Throwable throwable) {
 		log(LogLevel.TRACE, throwable);
 	}
 
-	public default void log(LogLevel level, Throwable throwable) {
-		log(new LogMessage(level, this, "An error occurred."), throwable);
-	}
-
 	public default void trace(String text, Throwable throwable) {
 		log(LogLevel.TRACE, text, throwable);
-	}
-
-	public default void log(LogLevel level, String text, Throwable throwable) {
-		log(new LogMessage(level, this, text), throwable);
 	}
 
 	public default void debug(String text) {
@@ -100,13 +110,5 @@ public interface ILogger {
 
 	public default void error(String text, Throwable throwable) {
 		log(LogLevel.ERROR, text, throwable);
-	}
-
-	public default void log(LogLevel level, Thread thread, String text, Throwable throwable) {
-		log(new LogMessage(level, this, thread, text), throwable);
-	}
-
-	public default void log(LocalTime time, LogLevel level, Thread thread, String text, Throwable throwable) {
-		log(new LogMessage(time, level, this, thread, text), throwable);
 	}
 }

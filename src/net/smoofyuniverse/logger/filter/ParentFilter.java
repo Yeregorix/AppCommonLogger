@@ -20,48 +20,43 @@
  * SOFTWARE.
  */
 
-package net.smoofyuniverse.common.logger.appender;
+package net.smoofyuniverse.logger.filter;
 
-import net.smoofyuniverse.common.logger.core.LogMessage;
+import net.smoofyuniverse.logger.core.LogMessage;
 
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.concurrent.CopyOnWriteArrayList;
 
-public class ParentAppender implements LogAppender {
-	private Collection<LogAppender> childs;
+public class ParentFilter implements LogFilter {
+	private Collection<LogFilter> childs;
+	private boolean dominantValue = false;
 
-	public ParentAppender() {
+	public ParentFilter() {
 		this(new CopyOnWriteArrayList<>());
 	}
 
-	public ParentAppender(Collection<LogAppender> childs) {
+	public ParentFilter(Collection<LogFilter> childs) {
 		this.childs = childs;
 	}
 
-	public ParentAppender(LogAppender... childs) {
-		this(Arrays.asList(childs));
-	}
-
-	public Collection<LogAppender> getChilds() {
+	public Collection<LogFilter> getChilds() {
 		return this.childs;
 	}
 
-	@Override
-	public void append(LogMessage msg) {
-		for (LogAppender a : this.childs)
-			a.append(msg);
+	public boolean getDominantValue() {
+		return this.dominantValue;
+	}
+
+	public void setDominantValue(boolean v) {
+		this.dominantValue = v;
 	}
 
 	@Override
-	public void appendRaw(String msg) {
-		for (LogAppender a : this.childs)
-			a.appendRaw(msg);
-	}
-
-	@Override
-	public void close() {
-		for (LogAppender a : this.childs)
-			a.close();
+	public boolean allow(LogMessage msg) {
+		for (LogFilter f : this.childs) {
+			if (f.allow(msg) == this.dominantValue)
+				return this.dominantValue;
+		}
+		return !this.dominantValue;
 	}
 }

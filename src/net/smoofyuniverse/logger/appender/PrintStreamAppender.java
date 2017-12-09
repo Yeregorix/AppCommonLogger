@@ -20,7 +20,7 @@
  * SOFTWARE.
  */
 
-package net.smoofyuniverse.common.logger.appender;
+package net.smoofyuniverse.logger.appender;
 
 import java.io.PrintStream;
 

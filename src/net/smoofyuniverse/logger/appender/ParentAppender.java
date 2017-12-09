@@ -20,66 +20,48 @@
  * SOFTWARE.
  */
 
-package net.smoofyuniverse.common.logger.appender;
+package net.smoofyuniverse.logger.appender;
 
-import java.io.BufferedWriter;
-import java.io.IOException;
-import java.nio.charset.Charset;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.StandardOpenOption;
+import net.smoofyuniverse.logger.core.LogMessage;
 
-public class FileAppender implements LogAppender {
-	private BufferedWriter writer;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.concurrent.CopyOnWriteArrayList;
 
-	private StandardOpenOption[] options;
-	private Charset charset;
-	private Path file;
+public class ParentAppender implements LogAppender {
+	private Collection<LogAppender> childs;
 
-	public FileAppender(Path file, StandardOpenOption... options) {
-		this(file, StandardCharsets.UTF_8, options);
+	public ParentAppender() {
+		this(new CopyOnWriteArrayList<>());
 	}
 
-	public FileAppender(Path file, Charset charset, StandardOpenOption... options) {
-		this.file = file;
+	public ParentAppender(Collection<LogAppender> childs) {
+		this.childs = childs;
 	}
 
-	public BufferedWriter getWriter() {
-		return this.writer;
+	public ParentAppender(LogAppender... childs) {
+		this(Arrays.asList(childs));
 	}
 
-	public StandardOpenOption[] getOptions() {
-		return this.options;
+	public Collection<LogAppender> getChilds() {
+		return this.childs;
 	}
 
-	public Charset getCharset() {
-		return this.charset;
-	}
-
-	public Path getFile() {
-		return this.file;
+	@Override
+	public void append(LogMessage msg) {
+		for (LogAppender a : this.childs)
+			a.append(msg);
 	}
 
 	@Override
 	public void appendRaw(String msg) {
-		try {
-			if (this.writer == null)
-				this.writer = Files.newBufferedWriter(this.file, this.charset, this.options);
-
-			this.writer.write(msg);
-			this.writer.flush();
-		} catch (IOException e) {
-			throw new RuntimeException(e);
-		}
+		for (LogAppender a : this.childs)
+			a.appendRaw(msg);
 	}
 
 	@Override
 	public void close() {
-		try {
-			this.writer.close();
-		} catch (IOException ignored) {
-		}
-		this.writer = null;
+		for (LogAppender a : this.childs)
+			a.close();
 	}
 }

@@ -20,31 +20,10 @@
  * SOFTWARE.
  */
 
-package net.smoofyuniverse.common.logger.appender;
+package net.smoofyuniverse.logger.formatter;
 
-import net.smoofyuniverse.common.logger.core.LogMessage;
-import net.smoofyuniverse.common.logger.filter.LogFilter;
+import net.smoofyuniverse.logger.core.LogMessage;
 
-public class FilteredAppender implements LogAppender {
-	private LogAppender delegate;
-	private LogFilter filter;
-
-	public FilteredAppender(LogAppender delegate, LogFilter filter) {
-		this.delegate = delegate;
-		this.filter = filter;
-	}
-
-	public LogAppender getDelegate() {
-		return this.delegate;
-	}
-
-	public LogFilter getFilter() {
-		return this.filter;
-	}
-
-	@Override
-	public void append(LogMessage msg) {
-		if (this.filter.allow(msg))
-			this.delegate.append(msg);
-	}
+public interface LogFormatter {
+	public String accept(LogMessage msg);
 }

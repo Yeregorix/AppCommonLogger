@@ -20,19 +20,8 @@
  * SOFTWARE.
  */
 
-package net.smoofyuniverse.common.logger.appender;
+package net.smoofyuniverse.logger.core;
 
-import net.smoofyuniverse.common.logger.core.LogMessage;
-
-public interface LogAppender {
-
-	public default void append(LogMessage msg) {
-		appendRaw(msg.text + System.lineSeparator());
-	}
-
-	public default void appendRaw(String msg) {
-		throw new UnsupportedOperationException("Row message not supported");
-	}
-
-	public default void close() {}
+public enum LogLevel {
+	TRACE, DEBUG, INFO, WARN, ERROR
 }

@@ -20,42 +20,35 @@
  * SOFTWARE.
  */
 
-package net.smoofyuniverse.common.logger.appender;
+package net.smoofyuniverse.logger.appender;
 
-import java.io.BufferedWriter;
-import java.io.IOException;
+import net.smoofyuniverse.logger.core.LogMessage;
+import net.smoofyuniverse.logger.formatter.LogFormatter;
 
-public class BufferedWriterAppender implements LogAppender {
-	private BufferedWriter writer;
+public class FormattedAppender implements LogAppender {
+	private LogAppender delegate;
+	private LogFormatter formatter;
 
-	public BufferedWriterAppender(BufferedWriter writer) {
-		this.writer = writer;
+	public FormattedAppender(LogAppender delegate, LogFormatter formatter) {
+		this.delegate = delegate;
+		this.formatter = formatter;
 	}
 
-	public BufferedWriter getWriter() {
-		return this.writer;
+	public LogAppender getDelegate() {
+		return this.delegate;
+	}
+
+	public LogFormatter getFormatter() {
+		return this.formatter;
+	}
+
+	@Override
+	public void append(LogMessage msg) {
+		this.delegate.appendRaw(this.formatter.accept(msg));
 	}
 
 	@Override
 	public void appendRaw(String msg) {
-		if (this.writer == null)
-			return;
-		try {
-			this.writer.write(msg);
-			this.writer.flush();
-		} catch (IOException e) {
-			throw new RuntimeException(e);
-		}
-	}
-
-	@Override
-	public void close() {
-		if (this.writer == null)
-			return;
-		try {
-			this.writer.close();
-		} catch (IOException ignored) {
-		}
-		this.writer = null;
+		this.delegate.appendRaw(msg);
 	}
 }

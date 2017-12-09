@@ -20,27 +20,12 @@
  * SOFTWARE.
  */
 
-package net.smoofyuniverse.common.logger.appender;
+package net.smoofyuniverse.logger.filter;
 
-import javafx.application.Platform;
-import javafx.scene.control.TextInputControl;
+import net.smoofyuniverse.logger.core.LogMessage;
 
-public class TextInputControlAppender implements LogAppender {
-	private TextInputControl textInput;
+public interface LogFilter {
+	public static final LogFilter DENY_ALL = (msg) -> false, ALLOW_ALL = (msg) -> true;
 
-	public TextInputControlAppender(TextInputControl textInput) {
-		this.textInput = textInput;
-	}
-
-	public TextInputControl getTextInput() {
-		return this.textInput;
-	}
-
-	@Override
-	public void appendRaw(String msg) {
-		if (Platform.isFxApplicationThread())
-			this.textInput.appendText(msg);
-		else
-			Platform.runLater(() -> this.textInput.appendText(msg));
-	}
+	public boolean allow(LogMessage msg);
 }

@@ -20,7 +20,7 @@
  * SOFTWARE.
  */
 
-package net.smoofyuniverse.common.logger.core;
+package net.smoofyuniverse.logger.core;
 
 import java.time.LocalTime;
 

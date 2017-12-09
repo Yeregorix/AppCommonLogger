@@ -20,10 +20,27 @@
  * SOFTWARE.
  */
 
-package net.smoofyuniverse.common.logger.formatter;
+package net.smoofyuniverse.logger.appender;
 
-import net.smoofyuniverse.common.logger.core.LogMessage;
+import javafx.application.Platform;
+import javafx.scene.control.TextInputControl;
 
-public interface LogFormatter {
-	public String accept(LogMessage msg);
+public class TextInputControlAppender implements LogAppender {
+	private TextInputControl textInput;
+
+	public TextInputControlAppender(TextInputControl textInput) {
+		this.textInput = textInput;
+	}
+
+	public TextInputControl getTextInput() {
+		return this.textInput;
+	}
+
+	@Override
+	public void appendRaw(String msg) {
+		if (Platform.isFxApplicationThread())
+			this.textInput.appendText(msg);
+		else
+			Platform.runLater(() -> this.textInput.appendText(msg));
+	}
 }

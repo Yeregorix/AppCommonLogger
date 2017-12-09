@@ -20,54 +20,30 @@
  * SOFTWARE.
  */
 
-package net.smoofyuniverse.common.logger.core;
+package net.smoofyuniverse.logger.core;
 
-import net.smoofyuniverse.common.logger.appender.LogAppender;
+import java.time.LocalTime;
 
-import java.util.Collections;
-import java.util.Map;
-import java.util.Optional;
-import java.util.concurrent.ConcurrentHashMap;
+public final class LogMessage {
+	public final LocalTime time;
+	public final LogLevel level;
+	public final ILogger logger;
+	public final Thread thread;
+	public final String text;
 
-public class LoggerFactory {
-	private Map<String, Logger> loggers = new ConcurrentHashMap<>(), unmodifiableLoggers = Collections.unmodifiableMap(this.loggers);
-	private LogLevel level = LogLevel.TRACE;
-	private LogAppender appender;
-
-	public LoggerFactory(LogAppender appender) {
-		this.appender = appender;
+	public LogMessage(LogLevel level, ILogger logger, String text) {
+		this(level, logger, Thread.currentThread(), text);
 	}
 
-	public LogLevel getLevel() {
-		return this.level;
+	public LogMessage(LogLevel level, ILogger logger, Thread thread, String text) {
+		this(LocalTime.now(), level, logger, thread, text);
 	}
 
-	public void setLevel(LogLevel level) {
+	public LogMessage(LocalTime time, LogLevel level, ILogger logger, Thread thread, String text) {
+		this.time = time;
 		this.level = level;
-	}
-
-	public boolean isActive(LogLevel level) {
-		return level.ordinal() >= this.level.ordinal();
-	}
-
-	public LogAppender getAppender() {
-		return this.appender;
-	}
-
-	public Logger provideLogger(String name) {
-		Logger l = this.loggers.get(name);
-		if (l == null) {
-			l = new Logger(this, name);
-			this.loggers.put(name, l);
-		}
-		return l;
-	}
-
-	public Optional<Logger> getLogger(String name) {
-		return Optional.ofNullable(this.loggers.get(name));
-	}
-
-	public Map<String, Logger> getLoggers() {
-		return this.unmodifiableLoggers;
+		this.logger = logger;
+		this.thread = thread;
+		this.text = text;
 	}
 }

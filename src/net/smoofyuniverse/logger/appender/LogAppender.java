@@ -20,43 +20,19 @@
  * SOFTWARE.
  */
 
-package net.smoofyuniverse.common.logger.filter;
+package net.smoofyuniverse.logger.appender;
 
-import net.smoofyuniverse.common.logger.core.LogMessage;
+import net.smoofyuniverse.logger.core.LogMessage;
 
-import java.util.Collection;
-import java.util.concurrent.CopyOnWriteArrayList;
+public interface LogAppender {
 
-public class ParentFilter implements LogFilter {
-	private Collection<LogFilter> childs;
-	private boolean dominantValue = false;
-
-	public ParentFilter() {
-		this(new CopyOnWriteArrayList<>());
+	public default void append(LogMessage msg) {
+		appendRaw(msg.text + System.lineSeparator());
 	}
 
-	public ParentFilter(Collection<LogFilter> childs) {
-		this.childs = childs;
+	public default void appendRaw(String msg) {
+		throw new UnsupportedOperationException("Row message not supported");
 	}
 
-	public Collection<LogFilter> getChilds() {
-		return this.childs;
-	}
-
-	public boolean getDominantValue() {
-		return this.dominantValue;
-	}
-
-	public void setDominantValue(boolean v) {
-		this.dominantValue = v;
-	}
-
-	@Override
-	public boolean allow(LogMessage msg) {
-		for (LogFilter f : this.childs) {
-			if (f.allow(msg) == this.dominantValue)
-				return this.dominantValue;
-		}
-		return !this.dominantValue;
-	}
+	public default void close() {}
 }

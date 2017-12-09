@@ -20,35 +20,31 @@
  * SOFTWARE.
  */
 
-package net.smoofyuniverse.common.logger.appender;
+package net.smoofyuniverse.logger.appender;
 
-import net.smoofyuniverse.common.logger.core.LogMessage;
-import net.smoofyuniverse.common.logger.formatter.LogFormatter;
+import net.smoofyuniverse.logger.core.LogMessage;
+import net.smoofyuniverse.logger.filter.LogFilter;
 
-public class FormattedAppender implements LogAppender {
+public class FilteredAppender implements LogAppender {
 	private LogAppender delegate;
-	private LogFormatter formatter;
+	private LogFilter filter;
 
-	public FormattedAppender(LogAppender delegate, LogFormatter formatter) {
+	public FilteredAppender(LogAppender delegate, LogFilter filter) {
 		this.delegate = delegate;
-		this.formatter = formatter;
+		this.filter = filter;
 	}
 
 	public LogAppender getDelegate() {
 		return this.delegate;
 	}
 
-	public LogFormatter getFormatter() {
-		return this.formatter;
+	public LogFilter getFilter() {
+		return this.filter;
 	}
 
 	@Override
 	public void append(LogMessage msg) {
-		this.delegate.appendRaw(this.formatter.accept(msg));
-	}
-
-	@Override
-	public void appendRaw(String msg) {
-		this.delegate.appendRaw(msg);
+		if (this.filter.allow(msg))
+			this.delegate.append(msg);
 	}
 }

@@ -20,65 +20,54 @@
  * SOFTWARE.
  */
 
-package net.smoofyuniverse.common.logger.core;
+package net.smoofyuniverse.logger.core;
 
-import net.smoofyuniverse.common.logger.appender.LogAppender;
+import net.smoofyuniverse.logger.appender.LogAppender;
 
-import java.io.PrintWriter;
-import java.io.StringWriter;
+import java.util.Collections;
+import java.util.Map;
 import java.util.Optional;
+import java.util.concurrent.ConcurrentHashMap;
 
-public final class Logger implements ILogger {
-	private LoggerFactory factory;
+public class LoggerFactory {
+	private Map<String, Logger> loggers = new ConcurrentHashMap<>(), unmodifiableLoggers = Collections.unmodifiableMap(this.loggers);
+	private LogLevel level = LogLevel.TRACE;
 	private LogAppender appender;
-	private LogLevel level;
-	private String name;
 
-	protected Logger(LoggerFactory factory, String name) {
-		this.factory = factory;
-		this.appender = factory.getAppender();
-		this.name = name;
-	}
-
-	public Logger(LogAppender appender, String name) {
+	public LoggerFactory(LogAppender appender) {
 		this.appender = appender;
-		this.name = name;
 	}
 
-	public Optional<LogLevel> getLevel() {
-		return Optional.ofNullable(this.level);
+	public LogLevel getLevel() {
+		return this.level;
 	}
 
 	public void setLevel(LogLevel level) {
 		this.level = level;
 	}
 
-	public Optional<LoggerFactory> getFactory() {
-		return Optional.ofNullable(this.factory);
-	}
-
-	@Override
 	public boolean isActive(LogLevel level) {
-		if (this.level == null)
-			return this.factory == null || this.factory.isActive(level);
 		return level.ordinal() >= this.level.ordinal();
 	}
 
-	@Override
-	public String getName() {
-		return this.name;
+	public LogAppender getAppender() {
+		return this.appender;
 	}
 
-	@Override
-	public void log(LogMessage msg, Throwable throwable) {
-		if (!isActive(msg.level))
-			return;
-
-		this.appender.append(msg);
-		if (throwable != null) {
-			StringWriter buffer = new StringWriter();
-			throwable.printStackTrace(new PrintWriter(buffer));
-			this.appender.appendRaw(buffer.toString());
+	public Logger provideLogger(String name) {
+		Logger l = this.loggers.get(name);
+		if (l == null) {
+			l = new Logger(this, name);
+			this.loggers.put(name, l);
 		}
+		return l;
+	}
+
+	public Optional<Logger> getLogger(String name) {
+		return Optional.ofNullable(this.loggers.get(name));
+	}
+
+	public Map<String, Logger> getLoggers() {
+		return this.unmodifiableLoggers;
 	}
 }

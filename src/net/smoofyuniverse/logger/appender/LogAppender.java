@@ -31,7 +31,7 @@ public interface LogAppender {
 	}
 
 	public default void appendRaw(String msg) {
-		throw new UnsupportedOperationException("Row message not supported");
+		throw new UnsupportedOperationException("Raw message not supported");
 	}
 
 	public default void close() {}

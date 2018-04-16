@@ -27,33 +27,39 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
+import java.text.ParsePosition;
+import java.time.Clock;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
+import java.util.Iterator;
+import java.util.TreeMap;
+import java.util.stream.Stream;
 
-public class DatedRollingFileAppender implements LogAppender {
-	public static final DateTimeFormatter DEFAULT_FORMAT = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+public final class DatedRollingFileAppender implements LogAppender {
+	public static final DateTimeFormatter DEFAULT_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+	public static final Clock DEFAULT_CLOCK = Clock.systemDefaultZone();
+
+	public final Path directory;
+	public final DateTimeFormatter formatter;
+	public final Clock clock;
+	public final String prefix, suffix;
+	public final int maxFiles;
 
 	private LocalDate currentDate;
 	private BufferedWriter writer;
 	private Path file;
 
-	private Path directory;
-	private String prefix, suffix;
-	private DateTimeFormatter formatter;
+	private DatedRollingFileAppender(Path dir, DateTimeFormatter formatter, Clock clock, String prefix, String suffix, int maxFiles) {
+		if (dir == null || formatter == null || clock == null || prefix == null || suffix == null)
+			throw new IllegalArgumentException();
 
-	public DatedRollingFileAppender(Path dir) {
-		this(dir, "", ".log");
-	}
-
-	public DatedRollingFileAppender(Path dir, String prefix, String suffix) {
-		this(dir, prefix, DEFAULT_FORMAT, suffix);
-	}
-
-	public DatedRollingFileAppender(Path dir, String prefix, DateTimeFormatter formatter, String suffix) {
 		this.directory = dir;
-		this.suffix = suffix;
 		this.formatter = formatter;
+		this.clock = clock;
+		this.suffix = suffix;
 		this.prefix = prefix;
+		this.maxFiles = maxFiles < 0 ? 0 : maxFiles;
 
 		try {
 			Files.createDirectories(dir);
@@ -61,25 +67,11 @@ public class DatedRollingFileAppender implements LogAppender {
 		}
 	}
 
-	public Path getDirectory() {
-		return this.directory;
-	}
-
-	public String getPrefix() {
-		return this.prefix;
-	}
-
-	public String getSuffix() {
-		return this.suffix;
-	}
-
-	public DateTimeFormatter getFormatter() {
-		return this.formatter;
-	}
-
 	@Override
 	public void appendRaw(String msg) {
 		try {
+			if (update())
+				cleanup();
 			getWriter().write(msg);
 			this.writer.flush();
 		} catch (IOException e) {
@@ -87,20 +79,61 @@ public class DatedRollingFileAppender implements LogAppender {
 		}
 	}
 
-	public BufferedWriter getWriter() throws IOException {
-		if (this.file != getFile()) {
+	public boolean update() {
+		LocalDate today = LocalDate.now(this.clock);
+		if (!today.equals(this.currentDate)) {
+			this.file = this.directory.resolve(this.prefix + this.formatter.format(today) + this.suffix);
+			this.currentDate = today;
 			close();
-			this.writer = Files.newBufferedWriter(this.file, StandardOpenOption.CREATE, StandardOpenOption.APPEND);
+			return true;
 		}
+		return false;
+	}
+
+	public void cleanup() throws IOException {
+		if (this.maxFiles == 0)
+			return;
+
+		TreeMap<LocalDate, Path> files = new TreeMap<>();
+
+		try (Stream<Path> st = Files.list(this.directory)) {
+			Iterator<Path> it = st.iterator();
+			while (it.hasNext()) {
+				Path p = it.next();
+				String fn = p.getFileName().toString();
+				if (fn.startsWith(this.prefix) && fn.endsWith(this.suffix)) {
+					try {
+						files.put(LocalDate.from(this.formatter.parse(fn, new ParsePosition(this.prefix.length()))), p);
+					} catch (DateTimeParseException ignored) {
+					}
+				}
+			}
+		}
+
+		if (this.file != null)
+			files.put(this.currentDate, this.file);
+
+		int toDelete = files.size() - this.maxFiles;
+		if (toDelete <= 0)
+			return;
+
+		for (Path p : files.values()) {
+			Files.delete(p);
+			toDelete--;
+			if (toDelete == 0)
+				break;
+		}
+	}
+
+	public BufferedWriter getWriter() throws IOException {
+		if (this.writer == null)
+			this.writer = Files.newBufferedWriter(getFile(), StandardOpenOption.CREATE, StandardOpenOption.APPEND);
 		return this.writer;
 	}
 
 	public Path getFile() {
-		LocalDate today = LocalDate.now();
-		if (!today.equals(this.currentDate)) {
-			this.file = this.directory.resolve(this.prefix + this.formatter.format(today) + this.suffix);
-			this.currentDate = today;
-		}
+		if (this.file == null)
+			throw new IllegalStateException();
 		return this.file;
 	}
 
@@ -113,5 +146,53 @@ public class DatedRollingFileAppender implements LogAppender {
 		} catch (IOException ignored) {
 		}
 		this.writer = null;
+	}
+
+	public static Builder builder() {
+		return new Builder();
+	}
+
+	public static class Builder {
+		private Path directory;
+		private DateTimeFormatter formatter = DEFAULT_FORMATTER;
+		private Clock clock = DEFAULT_CLOCK;
+		private String prefix = "", suffix = ".log";
+		private int maxFiles = 0;
+
+		private Builder() {}
+
+		public Builder directory(Path value) {
+			this.directory = value;
+			return this;
+		}
+
+		public Builder formatter(DateTimeFormatter value) {
+			this.formatter = value;
+			return this;
+		}
+
+		public Builder clock(Clock value) {
+			this.clock = value;
+			return this;
+		}
+
+		public Builder prefix(String value) {
+			this.prefix = value;
+			return this;
+		}
+
+		public Builder suffix(String value) {
+			this.suffix = value;
+			return this;
+		}
+
+		public Builder maxFiles(int value) {
+			this.maxFiles = value;
+			return this;
+		}
+
+		public DatedRollingFileAppender build() {
+			return new DatedRollingFileAppender(this.directory, this.formatter, this.clock, this.prefix, this.suffix, this.maxFiles);
+		}
 	}
 }

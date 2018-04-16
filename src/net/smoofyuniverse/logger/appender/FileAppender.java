@@ -42,7 +42,12 @@ public class FileAppender implements LogAppender {
 	}
 
 	public FileAppender(Path file, Charset charset, StandardOpenOption... options) {
+		if (file == null || charset == null || options == null)
+			throw new IllegalArgumentException();
+
 		this.file = file;
+		this.charset = charset;
+		this.options = options;
 	}
 
 	public BufferedWriter getWriter() {

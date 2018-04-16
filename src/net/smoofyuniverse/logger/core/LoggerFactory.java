@@ -35,6 +35,9 @@ public class LoggerFactory {
 	private LogAppender appender;
 
 	public LoggerFactory(LogAppender appender) {
+		if (appender == null)
+			throw new IllegalArgumentException();
+
 		this.appender = appender;
 	}
 
@@ -55,6 +58,9 @@ public class LoggerFactory {
 	}
 
 	public Logger provideLogger(String name) {
+		if (name == null)
+			throw new IllegalArgumentException();
+
 		Logger l = this.loggers.get(name);
 		if (l == null) {
 			l = new Logger(this, name);
@@ -64,6 +70,9 @@ public class LoggerFactory {
 	}
 
 	public Optional<Logger> getLogger(String name) {
+		if (name == null)
+			throw new IllegalArgumentException();
+
 		return Optional.ofNullable(this.loggers.get(name));
 	}
 

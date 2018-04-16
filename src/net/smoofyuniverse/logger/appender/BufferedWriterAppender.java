@@ -29,6 +29,9 @@ public class BufferedWriterAppender implements LogAppender {
 	private BufferedWriter writer;
 
 	public BufferedWriterAppender(BufferedWriter writer) {
+		if (writer == null)
+			throw new IllegalArgumentException();
+
 		this.writer = writer;
 	}
 

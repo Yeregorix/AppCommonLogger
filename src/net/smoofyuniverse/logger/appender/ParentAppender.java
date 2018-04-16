@@ -29,39 +29,42 @@ import java.util.Collection;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 public class ParentAppender implements LogAppender {
-	private Collection<LogAppender> childs;
+	private Collection<LogAppender> children;
 
 	public ParentAppender() {
 		this(new CopyOnWriteArrayList<>());
 	}
 
-	public ParentAppender(Collection<LogAppender> childs) {
-		this.childs = childs;
+	public ParentAppender(LogAppender... children) {
+		this(Arrays.asList(children));
 	}
 
-	public ParentAppender(LogAppender... childs) {
-		this(Arrays.asList(childs));
+	public ParentAppender(Collection<LogAppender> children) {
+		if (children == null)
+			throw new IllegalArgumentException();
+
+		this.children = children;
 	}
 
-	public Collection<LogAppender> getChilds() {
-		return this.childs;
+	public Collection<LogAppender> getChildren() {
+		return this.children;
 	}
 
 	@Override
 	public void append(LogMessage msg) {
-		for (LogAppender a : this.childs)
+		for (LogAppender a : this.children)
 			a.append(msg);
 	}
 
 	@Override
 	public void appendRaw(String msg) {
-		for (LogAppender a : this.childs)
+		for (LogAppender a : this.children)
 			a.appendRaw(msg);
 	}
 
 	@Override
 	public void close() {
-		for (LogAppender a : this.childs)
+		for (LogAppender a : this.children)
 			a.close();
 	}
 }

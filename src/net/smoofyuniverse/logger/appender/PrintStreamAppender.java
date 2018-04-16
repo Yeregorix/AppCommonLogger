@@ -28,6 +28,9 @@ public class PrintStreamAppender implements LogAppender {
 	private PrintStream stream;
 
 	public PrintStreamAppender(PrintStream stream) {
+		if (stream == null)
+			throw new IllegalArgumentException();
+
 		this.stream = stream;
 	}
 

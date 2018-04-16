@@ -20,51 +20,32 @@
  * SOFTWARE.
  */
 
-package net.smoofyuniverse.logger.filter;
+package net.smoofyuniverse.logger.appender;
 
-import net.smoofyuniverse.logger.core.LogMessage;
+import net.smoofyuniverse.logger.transformer.LogTransformer;
 
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.concurrent.CopyOnWriteArrayList;
+public class TransformedAppender implements LogAppender {
+	private LogAppender delegate;
+	private LogTransformer transformer;
 
-public class ParentFilter implements LogFilter {
-	private Collection<LogFilter> children;
-	private boolean dominantValue = false;
-
-	public ParentFilter() {
-		this(new CopyOnWriteArrayList<>());
-	}
-
-	public ParentFilter(LogFilter... children) {
-		this(Arrays.asList(children));
-	}
-
-	public ParentFilter(Collection<LogFilter> children) {
-		if (children == null)
+	public TransformedAppender(LogAppender delegate, LogTransformer transformer) {
+		if (delegate == null || transformer == null)
 			throw new IllegalArgumentException();
 
-		this.children = children;
+		this.delegate = delegate;
+		this.transformer = transformer;
 	}
 
-	public Collection<LogFilter> getChildren() {
-		return this.children;
+	public LogAppender getDelegate() {
+		return this.delegate;
 	}
 
-	public boolean getDominantValue() {
-		return this.dominantValue;
-	}
-
-	public void setDominantValue(boolean v) {
-		this.dominantValue = v;
+	public LogTransformer getTransformer() {
+		return this.transformer;
 	}
 
 	@Override
-	public boolean allow(LogMessage msg) {
-		for (LogFilter f : this.children) {
-			if (f.allow(msg) == this.dominantValue)
-				return this.dominantValue;
-		}
-		return !this.dominantValue;
+	public void appendRaw(String msg) {
+		this.delegate.appendRaw(this.transformer.accept(msg));
 	}
 }

@@ -20,51 +20,13 @@
  * SOFTWARE.
  */
 
-package net.smoofyuniverse.logger.filter;
+package net.smoofyuniverse.logger.transformer;
 
-import net.smoofyuniverse.logger.core.LogMessage;
+public interface LogTransformer {
 
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.concurrent.CopyOnWriteArrayList;
-
-public class ParentFilter implements LogFilter {
-	private Collection<LogFilter> children;
-	private boolean dominantValue = false;
-
-	public ParentFilter() {
-		this(new CopyOnWriteArrayList<>());
+	public default String accept(String originalRawMsg, String currentRawMsg) {
+		return accept(currentRawMsg);
 	}
 
-	public ParentFilter(LogFilter... children) {
-		this(Arrays.asList(children));
-	}
-
-	public ParentFilter(Collection<LogFilter> children) {
-		if (children == null)
-			throw new IllegalArgumentException();
-
-		this.children = children;
-	}
-
-	public Collection<LogFilter> getChildren() {
-		return this.children;
-	}
-
-	public boolean getDominantValue() {
-		return this.dominantValue;
-	}
-
-	public void setDominantValue(boolean v) {
-		this.dominantValue = v;
-	}
-
-	@Override
-	public boolean allow(LogMessage msg) {
-		for (LogFilter f : this.children) {
-			if (f.allow(msg) == this.dominantValue)
-				return this.dominantValue;
-		}
-		return !this.dominantValue;
-	}
+	public String accept(String rawMsg);
 }

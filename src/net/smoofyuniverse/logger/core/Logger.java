@@ -35,12 +35,18 @@ public final class Logger implements ILogger {
 	private String name;
 
 	protected Logger(LoggerFactory factory, String name) {
+		if (factory == null || name == null)
+			throw new IllegalArgumentException();
+
 		this.factory = factory;
 		this.appender = factory.getAppender();
 		this.name = name;
 	}
 
 	public Logger(LogAppender appender, String name) {
+		if (appender == null || name == null)
+			throw new IllegalArgumentException();
+
 		this.appender = appender;
 		this.name = name;
 	}

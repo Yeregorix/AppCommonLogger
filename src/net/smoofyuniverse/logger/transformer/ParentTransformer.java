@@ -20,51 +20,44 @@
  * SOFTWARE.
  */
 
-package net.smoofyuniverse.logger.filter;
-
-import net.smoofyuniverse.logger.core.LogMessage;
+package net.smoofyuniverse.logger.transformer;
 
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.concurrent.CopyOnWriteArrayList;
 
-public class ParentFilter implements LogFilter {
-	private Collection<LogFilter> children;
+public class ParentTransformer implements LogTransformer {
+	private Collection<LogTransformer> children;
 	private boolean dominantValue = false;
 
-	public ParentFilter() {
+	public ParentTransformer() {
 		this(new CopyOnWriteArrayList<>());
 	}
 
-	public ParentFilter(LogFilter... children) {
-		this(Arrays.asList(children));
-	}
-
-	public ParentFilter(Collection<LogFilter> children) {
+	public ParentTransformer(Collection<LogTransformer> children) {
 		if (children == null)
 			throw new IllegalArgumentException();
 
 		this.children = children;
 	}
 
-	public Collection<LogFilter> getChildren() {
+	public ParentTransformer(LogTransformer... children) {
+		this(Arrays.asList(children));
+	}
+
+	public Collection<LogTransformer> getChildren() {
 		return this.children;
 	}
 
-	public boolean getDominantValue() {
-		return this.dominantValue;
-	}
-
-	public void setDominantValue(boolean v) {
-		this.dominantValue = v;
+	@Override
+	public String accept(String originalRawMsg, String currentRawMsg) {
+		for (LogTransformer t : this.children)
+			currentRawMsg = t.accept(originalRawMsg, currentRawMsg);
+		return currentRawMsg;
 	}
 
 	@Override
-	public boolean allow(LogMessage msg) {
-		for (LogFilter f : this.children) {
-			if (f.allow(msg) == this.dominantValue)
-				return this.dominantValue;
-		}
-		return !this.dominantValue;
+	public String accept(String rawMsg) {
+		return accept(rawMsg, rawMsg);
 	}
 }

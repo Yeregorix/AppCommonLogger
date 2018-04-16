@@ -29,6 +29,9 @@ public class TextInputControlAppender implements LogAppender {
 	private TextInputControl textInput;
 
 	public TextInputControlAppender(TextInputControl textInput) {
+		if (textInput == null)
+			throw new IllegalArgumentException();
+
 		this.textInput = textInput;
 	}
 

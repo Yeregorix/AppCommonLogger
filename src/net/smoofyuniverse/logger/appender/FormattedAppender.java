@@ -30,6 +30,9 @@ public class FormattedAppender implements LogAppender {
 	private LogFormatter formatter;
 
 	public FormattedAppender(LogAppender delegate, LogFormatter formatter) {
+		if (delegate == null || formatter == null)
+			throw new IllegalArgumentException();
+
 		this.delegate = delegate;
 		this.formatter = formatter;
 	}

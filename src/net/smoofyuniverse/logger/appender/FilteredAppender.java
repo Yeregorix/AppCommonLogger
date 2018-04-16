@@ -30,6 +30,9 @@ public class FilteredAppender implements LogAppender {
 	private LogFilter filter;
 
 	public FilteredAppender(LogAppender delegate, LogFilter filter) {
+		if (delegate == null || filter == null)
+			throw new IllegalArgumentException();
+
 		this.delegate = delegate;
 		this.filter = filter;
 	}

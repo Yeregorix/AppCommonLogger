@@ -24,6 +24,7 @@ package net.smoofyuniverse.logger.appender;
 
 import java.io.BufferedWriter;
 import java.io.IOException;
+import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
@@ -32,9 +33,7 @@ import java.time.Clock;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
-import java.util.Iterator;
 import java.util.TreeMap;
-import java.util.stream.Stream;
 
 public final class DatedRollingFileAppender implements LogAppender {
 	public static final DateTimeFormatter DEFAULT_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd");
@@ -74,8 +73,8 @@ public final class DatedRollingFileAppender implements LogAppender {
 				cleanup();
 			getWriter().write(msg);
 			this.writer.flush();
-		} catch (IOException e) {
-			throw new RuntimeException(e);
+		} catch (Exception e) {
+			throw e instanceof RuntimeException ? (RuntimeException) e : new RuntimeException(e);
 		}
 	}
 
@@ -90,16 +89,14 @@ public final class DatedRollingFileAppender implements LogAppender {
 		return false;
 	}
 
-	public void cleanup() throws IOException {
+	public void cleanup() throws Exception {
 		if (this.maxFiles == 0)
 			return;
 
 		TreeMap<LocalDate, Path> files = new TreeMap<>();
 
-		try (Stream<Path> st = Files.list(this.directory)) {
-			Iterator<Path> it = st.iterator();
-			while (it.hasNext()) {
-				Path p = it.next();
+		try (DirectoryStream<Path> st = Files.newDirectoryStream(this.directory)) {
+			for (Path p : st) {
 				String fn = p.getFileName().toString();
 				if (fn.startsWith(this.prefix) && fn.endsWith(this.suffix)) {
 					try {

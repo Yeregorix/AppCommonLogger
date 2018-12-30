@@ -25,7 +25,7 @@ package net.smoofyuniverse.logger.filter;
 import net.smoofyuniverse.logger.core.LogMessage;
 
 public interface LogFilter {
-	public static final LogFilter DENY_ALL = (msg) -> false, ALLOW_ALL = (msg) -> true;
+	LogFilter DENY_ALL = (msg) -> false, ALLOW_ALL = (msg) -> true;
 
-	public boolean allow(LogMessage msg);
+	boolean allow(LogMessage msg);
 }

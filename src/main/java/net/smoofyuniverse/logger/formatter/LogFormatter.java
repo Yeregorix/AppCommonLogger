@@ -25,5 +25,5 @@ package net.smoofyuniverse.logger.formatter;
 import net.smoofyuniverse.logger.core.LogMessage;
 
 public interface LogFormatter {
-	public String accept(LogMessage msg);
+	String accept(LogMessage msg);
 }

@@ -24,9 +24,9 @@ package net.smoofyuniverse.logger.transformer;
 
 public interface LogTransformer {
 
-	public default String accept(String originalRawMsg, String currentRawMsg) {
+	default String accept(String originalRawMsg, String currentRawMsg) {
 		return accept(currentRawMsg);
 	}
 
-	public String accept(String rawMsg);
+	String accept(String rawMsg);
 }

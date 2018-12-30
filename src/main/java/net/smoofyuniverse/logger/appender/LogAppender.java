@@ -26,13 +26,13 @@ import net.smoofyuniverse.logger.core.LogMessage;
 
 public interface LogAppender {
 
-	public default void append(LogMessage msg) {
+	default void append(LogMessage msg) {
 		appendRaw(msg.text + System.lineSeparator());
 	}
 
-	public default void appendRaw(String msg) {
+	default void appendRaw(String msg) {
 		throw new UnsupportedOperationException("Raw message not supported");
 	}
 
-	public default void close() {}
+	default void close() {}
 }

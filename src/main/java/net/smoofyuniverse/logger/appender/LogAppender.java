@@ -27,7 +27,7 @@ import net.smoofyuniverse.logger.core.LogMessage;
 public interface LogAppender {
 
 	default void append(LogMessage msg) {
-		appendRaw(msg.text + System.lineSeparator());
+		appendRaw(msg.getText() + System.lineSeparator());
 	}
 
 	default void appendRaw(String msg) {

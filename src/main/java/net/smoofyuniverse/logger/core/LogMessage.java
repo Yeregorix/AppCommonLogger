@@ -23,13 +23,16 @@
 package net.smoofyuniverse.logger.core;
 
 import java.time.LocalTime;
+import java.util.function.Supplier;
 
 public final class LogMessage {
 	public final LocalTime time;
 	public final LogLevel level;
 	public final ILogger logger;
 	public final Thread thread;
-	public final String text;
+
+	private Supplier<String> supplier;
+	private String text;
 
 	public LogMessage(LogLevel level, ILogger logger, String text) {
 		this(level, logger, Thread.currentThread(), text);
@@ -40,10 +43,49 @@ public final class LogMessage {
 	}
 
 	public LogMessage(LocalTime time, LogLevel level, ILogger logger, Thread thread, String text) {
+		this(time, level, logger, thread);
+		if (text == null)
+			throw new IllegalArgumentException("text");
+		this.text = text;
+	}
+
+	private LogMessage(LocalTime time, LogLevel level, ILogger logger, Thread thread) {
+		if (time == null)
+			throw new IllegalArgumentException("time");
+		if (level == null)
+			throw new IllegalArgumentException("level");
+		if (logger == null)
+			throw new IllegalArgumentException("logger");
+		if (thread == null)
+			throw new IllegalArgumentException("thread");
+
 		this.time = time;
 		this.level = level;
 		this.logger = logger;
 		this.thread = thread;
-		this.text = text;
+	}
+
+	public LogMessage(LogLevel level, ILogger logger, Supplier<String> supplier) {
+		this(level, logger, Thread.currentThread(), supplier);
+	}
+
+	public LogMessage(LogLevel level, ILogger logger, Thread thread, Supplier<String> supplier) {
+		this(LocalTime.now(), level, logger, thread, supplier);
+	}
+
+	public LogMessage(LocalTime time, LogLevel level, ILogger logger, Thread thread, Supplier<String> supplier) {
+		this(time, level, logger, thread);
+		if (supplier == null)
+			throw new IllegalArgumentException("supplier");
+		this.supplier = supplier;
+	}
+
+	public String getText() {
+		if (this.text == null) {
+			this.text = this.supplier.get();
+			if (this.text == null)
+				this.text = "";
+		}
+		return this.text;
 	}
 }

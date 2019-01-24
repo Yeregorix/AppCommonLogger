@@ -23,6 +23,7 @@
 package net.smoofyuniverse.logger.core;
 
 import java.time.LocalTime;
+import java.util.function.Supplier;
 
 public interface ILogger {
 
@@ -30,12 +31,12 @@ public interface ILogger {
 
 	boolean isActive(LogLevel level);
 
-	default void log(LogLevel level, Thread thread, String text, Throwable throwable) {
-		log(new LogMessage(level, this, thread, text), throwable);
-	}
-
 	default void log(LogLevel level, String text) {
 		log(new LogMessage(level, this, text), null);
+	}
+
+	default void log(LogLevel level, Thread thread, String text, Throwable throwable) {
+		log(new LogMessage(level, this, thread, text), throwable);
 	}
 
 	default void log(LogLevel level, Throwable throwable) {
@@ -48,12 +49,32 @@ public interface ILogger {
 
 	void log(LogMessage msg, Throwable throwable);
 
+	default void log(LogLevel level, Thread thread, Supplier<String> supplier, Throwable throwable) {
+		log(new LogMessage(level, this, thread, supplier), throwable);
+	}
+
+	default void log(LocalTime time, LogLevel level, Thread thread, Supplier<String> supplier, Throwable throwable) {
+		log(new LogMessage(time, level, this, thread, supplier), throwable);
+	}
+
 	default void log(LocalTime time, LogLevel level, Thread thread, String text, Throwable throwable) {
 		log(new LogMessage(time, level, this, thread, text), throwable);
 	}
 
+	default void trace(Supplier<String> supplier) {
+		log(LogLevel.TRACE, supplier);
+	}
+
+	default void log(LogLevel level, Supplier<String> supplier) {
+		log(new LogMessage(level, this, supplier), null);
+	}
+
 	default void trace(String text) {
 		log(LogLevel.TRACE, text);
+	}
+
+	default void trace(Supplier<String> supplier, Throwable throwable) {
+		log(LogLevel.TRACE, supplier, throwable);
 	}
 
 	default void trace(Throwable throwable) {
@@ -64,8 +85,16 @@ public interface ILogger {
 		log(LogLevel.TRACE, text, throwable);
 	}
 
+	default void log(LogLevel level, Supplier<String> supplier, Throwable throwable) {
+		log(new LogMessage(level, this, supplier), throwable);
+	}
+
 	default void debug(String text) {
 		log(LogLevel.DEBUG, text);
+	}
+
+	default void debug(Supplier<String> supplier) {
+		log(LogLevel.DEBUG, supplier);
 	}
 
 	default void debug(Throwable throwable) {
@@ -76,8 +105,16 @@ public interface ILogger {
 		log(LogLevel.DEBUG, text, throwable);
 	}
 
+	default void debug(Supplier<String> supplier, Throwable throwable) {
+		log(LogLevel.DEBUG, supplier, throwable);
+	}
+
 	default void info(String text) {
 		log(LogLevel.INFO, text);
+	}
+
+	default void info(Supplier<String> supplier) {
+		log(LogLevel.INFO, supplier);
 	}
 
 	default void info(Throwable throwable) {
@@ -88,8 +125,16 @@ public interface ILogger {
 		log(LogLevel.INFO, text, throwable);
 	}
 
+	default void info(Supplier<String> supplier, Throwable throwable) {
+		log(LogLevel.INFO, supplier, throwable);
+	}
+
 	default void warn(String text) {
 		log(LogLevel.WARN, text);
+	}
+
+	default void warn(Supplier<String> supplier) {
+		log(LogLevel.WARN, supplier);
 	}
 
 	default void warn(Throwable throwable) {
@@ -100,8 +145,16 @@ public interface ILogger {
 		log(LogLevel.WARN, text, throwable);
 	}
 
+	default void warn(Supplier<String> supplier, Throwable throwable) {
+		log(LogLevel.WARN, supplier, throwable);
+	}
+
 	default void error(String text) {
 		log(LogLevel.ERROR, text);
+	}
+
+	default void error(Supplier<String> supplier) {
+		log(LogLevel.ERROR, supplier);
 	}
 
 	default void error(Throwable throwable) {
@@ -110,5 +163,9 @@ public interface ILogger {
 
 	default void error(String text, Throwable throwable) {
 		log(LogLevel.ERROR, text, throwable);
+	}
+
+	default void error(Supplier<String> supplier, Throwable throwable) {
+		log(LogLevel.ERROR, supplier, throwable);
 	}
 }

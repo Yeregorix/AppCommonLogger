@@ -50,4 +50,10 @@ public class FilteredAppender implements LogAppender {
 		if (this.filter.allow(msg))
 			this.delegate.append(msg);
 	}
+
+	@Override
+	public void appendRaw(String msg) {
+		if (this.filter.allowRaw(msg))
+			this.delegate.appendRaw(msg);
+	}
 }

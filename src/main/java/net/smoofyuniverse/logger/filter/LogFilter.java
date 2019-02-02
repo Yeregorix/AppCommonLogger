@@ -25,7 +25,29 @@ package net.smoofyuniverse.logger.filter;
 import net.smoofyuniverse.logger.core.LogMessage;
 
 public interface LogFilter {
-	LogFilter DENY_ALL = (msg) -> false, ALLOW_ALL = (msg) -> true;
+	LogFilter DENY_ALL = new LogFilter() {
+		@Override
+		public boolean allow(LogMessage msg) {
+			return false;
+		}
+
+		@Override
+		public boolean allowRaw(String msg) {
+			return false;
+		}
+	}, ALLOW_ALL = new LogFilter() {
+		@Override
+		public boolean allow(LogMessage msg) {
+			return true;
+		}
+
+		@Override
+		public boolean allowRaw(String msg) {
+			return true;
+		}
+	};
 
 	boolean allow(LogMessage msg);
+
+	boolean allowRaw(String msg);
 }

@@ -67,4 +67,13 @@ public class ParentFilter implements LogFilter {
 		}
 		return !this.dominantValue;
 	}
+
+	@Override
+	public boolean allowRaw(String msg) {
+		for (LogFilter f : this.children) {
+			if (f.allowRaw(msg) == this.dominantValue)
+				return this.dominantValue;
+		}
+		return !this.dominantValue;
+	}
 }

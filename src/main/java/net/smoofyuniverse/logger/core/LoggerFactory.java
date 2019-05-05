@@ -36,8 +36,7 @@ public class LoggerFactory {
 
 	public LoggerFactory(LogAppender appender) {
 		if (appender == null)
-			throw new IllegalArgumentException();
-
+			throw new IllegalArgumentException("appender");
 		this.appender = appender;
 	}
 

@@ -29,8 +29,8 @@ import java.util.Collection;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 public class ParentFilter implements LogFilter {
-	private Collection<LogFilter> children;
-	private boolean dominantValue = false;
+	public final Collection<LogFilter> children;
+	public boolean dominantValue = false;
 
 	public ParentFilter() {
 		this(new CopyOnWriteArrayList<>());
@@ -42,21 +42,8 @@ public class ParentFilter implements LogFilter {
 
 	public ParentFilter(Collection<LogFilter> children) {
 		if (children == null)
-			throw new IllegalArgumentException();
-
+			throw new IllegalArgumentException("children");
 		this.children = children;
-	}
-
-	public Collection<LogFilter> getChildren() {
-		return this.children;
-	}
-
-	public boolean getDominantValue() {
-		return this.dominantValue;
-	}
-
-	public void setDominantValue(boolean v) {
-		this.dominantValue = v;
 	}
 
 	@Override

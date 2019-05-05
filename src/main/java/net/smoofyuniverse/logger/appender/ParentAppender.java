@@ -29,7 +29,7 @@ import java.util.Collection;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 public class ParentAppender implements LogAppender {
-	private Collection<LogAppender> children;
+	public final Collection<LogAppender> children;
 
 	public ParentAppender() {
 		this(new CopyOnWriteArrayList<>());
@@ -41,13 +41,8 @@ public class ParentAppender implements LogAppender {
 
 	public ParentAppender(Collection<LogAppender> children) {
 		if (children == null)
-			throw new IllegalArgumentException();
-
+			throw new IllegalArgumentException("children");
 		this.children = children;
-	}
-
-	public Collection<LogAppender> getChildren() {
-		return this.children;
 	}
 
 	@Override

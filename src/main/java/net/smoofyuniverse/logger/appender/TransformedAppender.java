@@ -25,23 +25,17 @@ package net.smoofyuniverse.logger.appender;
 import net.smoofyuniverse.logger.transformer.LogTransformer;
 
 public class TransformedAppender implements LogAppender {
-	private LogAppender delegate;
-	private LogTransformer transformer;
+	public final LogAppender delegate;
+	public final LogTransformer transformer;
 
 	public TransformedAppender(LogAppender delegate, LogTransformer transformer) {
-		if (delegate == null || transformer == null)
-			throw new IllegalArgumentException();
+		if (delegate == null)
+			throw new IllegalArgumentException("delegate");
+		if (transformer == null)
+			throw new IllegalArgumentException("transformer");
 
 		this.delegate = delegate;
 		this.transformer = transformer;
-	}
-
-	public LogAppender getDelegate() {
-		return this.delegate;
-	}
-
-	public LogTransformer getTransformer() {
-		return this.transformer;
 	}
 
 	@Override

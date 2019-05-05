@@ -25,17 +25,12 @@ package net.smoofyuniverse.logger.appender;
 import java.io.PrintStream;
 
 public class PrintStreamAppender implements LogAppender {
-	private PrintStream stream;
+	public final PrintStream stream;
 
 	public PrintStreamAppender(PrintStream stream) {
 		if (stream == null)
-			throw new IllegalArgumentException();
-
+			throw new IllegalArgumentException("stream");
 		this.stream = stream;
-	}
-
-	public PrintStream getStream() {
-		return this.stream;
 	}
 
 	@Override

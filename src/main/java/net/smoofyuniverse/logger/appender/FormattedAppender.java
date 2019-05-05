@@ -26,23 +26,17 @@ import net.smoofyuniverse.logger.core.LogMessage;
 import net.smoofyuniverse.logger.formatter.LogFormatter;
 
 public class FormattedAppender implements LogAppender {
-	private LogAppender delegate;
-	private LogFormatter formatter;
+	public final LogAppender delegate;
+	public final LogFormatter formatter;
 
 	public FormattedAppender(LogAppender delegate, LogFormatter formatter) {
-		if (delegate == null || formatter == null)
-			throw new IllegalArgumentException();
+		if (delegate == null)
+			throw new IllegalArgumentException("delegate");
+		if (formatter == null)
+			throw new IllegalArgumentException("formatter");
 
 		this.delegate = delegate;
 		this.formatter = formatter;
-	}
-
-	public LogAppender getDelegate() {
-		return this.delegate;
-	}
-
-	public LogFormatter getFormatter() {
-		return this.formatter;
 	}
 
 	@Override

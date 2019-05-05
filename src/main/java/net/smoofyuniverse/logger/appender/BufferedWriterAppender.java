@@ -26,22 +26,18 @@ import java.io.BufferedWriter;
 import java.io.IOException;
 
 public class BufferedWriterAppender implements LogAppender {
-	private BufferedWriter writer;
+	public final BufferedWriter writer;
+	private boolean closed = false;
 
 	public BufferedWriterAppender(BufferedWriter writer) {
 		if (writer == null)
-			throw new IllegalArgumentException();
-
+			throw new IllegalArgumentException("writer");
 		this.writer = writer;
-	}
-
-	public BufferedWriter getWriter() {
-		return this.writer;
 	}
 
 	@Override
 	public void appendRaw(String msg) {
-		if (this.writer == null)
+		if (this.closed)
 			return;
 		try {
 			this.writer.write(msg);
@@ -53,12 +49,12 @@ public class BufferedWriterAppender implements LogAppender {
 
 	@Override
 	public void close() {
-		if (this.writer == null)
+		if (this.closed)
 			return;
 		try {
 			this.writer.close();
 		} catch (IOException ignored) {
 		}
-		this.writer = null;
+		this.closed = true;
 	}
 }

@@ -49,11 +49,19 @@ public final class DatedRollingFileAppender implements LogAppender {
 	private BufferedWriter writer;
 	private Path file;
 
-	private DatedRollingFileAppender(Path dir, DateTimeFormatter formatter, Clock clock, String prefix, String suffix, int maxFiles) {
-		if (dir == null || formatter == null || clock == null || prefix == null || suffix == null)
-			throw new IllegalArgumentException();
+	public DatedRollingFileAppender(Path directory, DateTimeFormatter formatter, Clock clock, String prefix, String suffix, int maxFiles) {
+		if (directory == null)
+			throw new IllegalArgumentException("directory");
+		if (formatter == null)
+			throw new IllegalArgumentException("formatter");
+		if (clock == null)
+			throw new IllegalArgumentException("clock");
+		if (prefix == null)
+			throw new IllegalArgumentException("prefix");
+		if (suffix == null)
+			throw new IllegalArgumentException("suffix");
 
-		this.directory = dir;
+		this.directory = directory;
 		this.formatter = formatter;
 		this.clock = clock;
 		this.suffix = suffix;
@@ -61,7 +69,7 @@ public final class DatedRollingFileAppender implements LogAppender {
 		this.maxFiles = maxFiles < 0 ? 0 : maxFiles;
 
 		try {
-			Files.createDirectories(dir);
+			Files.createDirectories(directory);
 		} catch (IOException ignored) {
 		}
 	}

@@ -27,8 +27,7 @@ import java.util.Collection;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 public class ParentTransformer implements LogTransformer {
-	private Collection<LogTransformer> children;
-	private boolean dominantValue = false;
+	public final Collection<LogTransformer> children;
 
 	public ParentTransformer() {
 		this(new CopyOnWriteArrayList<>());
@@ -36,17 +35,12 @@ public class ParentTransformer implements LogTransformer {
 
 	public ParentTransformer(Collection<LogTransformer> children) {
 		if (children == null)
-			throw new IllegalArgumentException();
-
+			throw new IllegalArgumentException("children");
 		this.children = children;
 	}
 
 	public ParentTransformer(LogTransformer... children) {
 		this(Arrays.asList(children));
-	}
-
-	public Collection<LogTransformer> getChildren() {
-		return this.children;
 	}
 
 	@Override

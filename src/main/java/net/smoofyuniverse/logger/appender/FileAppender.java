@@ -33,37 +33,25 @@ import java.nio.file.StandardOpenOption;
 public class FileAppender implements LogAppender {
 	private BufferedWriter writer;
 
-	private StandardOpenOption[] options;
-	private Charset charset;
-	private Path file;
+	public final StandardOpenOption[] options;
+	public final Charset charset;
+	public final Path file;
 
 	public FileAppender(Path file, StandardOpenOption... options) {
 		this(file, StandardCharsets.UTF_8, options);
 	}
 
 	public FileAppender(Path file, Charset charset, StandardOpenOption... options) {
-		if (file == null || charset == null || options == null)
-			throw new IllegalArgumentException();
+		if (file == null)
+			throw new IllegalArgumentException("file");
+		if (charset == null)
+			throw new IllegalArgumentException("charset");
+		if (options == null)
+			throw new IllegalArgumentException("options");
 
 		this.file = file;
 		this.charset = charset;
 		this.options = options;
-	}
-
-	public BufferedWriter getWriter() {
-		return this.writer;
-	}
-
-	public StandardOpenOption[] getOptions() {
-		return this.options;
-	}
-
-	public Charset getCharset() {
-		return this.charset;
-	}
-
-	public Path getFile() {
-		return this.file;
 	}
 
 	@Override

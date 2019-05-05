@@ -26,17 +26,12 @@ import javafx.application.Platform;
 import javafx.scene.control.TextInputControl;
 
 public class TextInputControlAppender implements LogAppender {
-	private TextInputControl textInput;
+	public final TextInputControl textInput;
 
 	public TextInputControlAppender(TextInputControl textInput) {
 		if (textInput == null)
-			throw new IllegalArgumentException();
-
+			throw new IllegalArgumentException("textInput");
 		this.textInput = textInput;
-	}
-
-	public TextInputControl getTextInput() {
-		return this.textInput;
 	}
 
 	@Override

@@ -26,23 +26,17 @@ import net.smoofyuniverse.logger.core.LogMessage;
 import net.smoofyuniverse.logger.filter.LogFilter;
 
 public class FilteredAppender implements LogAppender {
-	private LogAppender delegate;
-	private LogFilter filter;
+	public final LogAppender delegate;
+	public final LogFilter filter;
 
 	public FilteredAppender(LogAppender delegate, LogFilter filter) {
-		if (delegate == null || filter == null)
-			throw new IllegalArgumentException();
+		if (delegate == null)
+			throw new IllegalArgumentException("delegate");
+		if (filter == null)
+			throw new IllegalArgumentException("filter");
 
 		this.delegate = delegate;
 		this.filter = filter;
-	}
-
-	public LogAppender getDelegate() {
-		return this.delegate;
-	}
-
-	public LogFilter getFilter() {
-		return this.filter;
 	}
 
 	@Override

@@ -35,8 +35,10 @@ public final class Logger implements ILogger {
 	private String name;
 
 	protected Logger(LoggerFactory factory, String name) {
-		if (factory == null || name == null)
-			throw new IllegalArgumentException();
+		if (factory == null)
+			throw new IllegalArgumentException("factory");
+		if (name == null)
+			throw new IllegalArgumentException("name");
 
 		this.factory = factory;
 		this.appender = factory.getAppender();

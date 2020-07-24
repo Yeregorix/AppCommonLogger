@@ -30,9 +30,9 @@ import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class LoggerFactory {
-	private Map<String, Logger> loggers = new ConcurrentHashMap<>(), unmodifiableLoggers = Collections.unmodifiableMap(this.loggers);
+	private final Map<String, Logger> loggers = new ConcurrentHashMap<>(), unmodifiableLoggers = Collections.unmodifiableMap(this.loggers);
+	private final LogAppender appender;
 	private LogLevel level = LogLevel.TRACE;
-	private LogAppender appender;
 
 	public LoggerFactory(LogAppender appender) {
 		if (appender == null)

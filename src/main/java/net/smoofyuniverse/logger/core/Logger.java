@@ -29,10 +29,10 @@ import java.io.StringWriter;
 import java.util.Optional;
 
 public final class Logger implements ILogger {
-	private LoggerFactory factory;
-	private LogAppender appender;
+	private final LoggerFactory factory;
+	private final LogAppender appender;
+	private final String name;
 	private LogLevel level;
-	private String name;
 
 	protected Logger(LoggerFactory factory, String name) {
 		if (factory == null)
@@ -49,6 +49,7 @@ public final class Logger implements ILogger {
 		if (appender == null || name == null)
 			throw new IllegalArgumentException();
 
+		this.factory = null;
 		this.appender = appender;
 		this.name = name;
 	}

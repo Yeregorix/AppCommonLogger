@@ -28,7 +28,7 @@ plugins {
 
 group 'net.smoofyuniverse'
 archivesBaseName = 'smoofylogger'
-version = '1.0.0-SNAPSHOT'
+version = '1.0.1-SNAPSHOT'
 
 sourceCompatibility = 1.8
 targetCompatibility = 1.8
@@ -67,7 +67,7 @@ uploadArchives {
             pom.project {
                 name 'SmoofyLogger'
                 packaging 'jar'
-                description 'Simple common logging framework.'
+                description 'Lightweight logging framework for Java.'
                 url 'https://github.com/Yeregorix/SmoofyLogger'
 
                 scm {

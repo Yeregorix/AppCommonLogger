@@ -54,26 +54,11 @@ public class ParentFilter implements LogFilter {
 	}
 
 	@Override
-	public int score(LogMessage msg) {
+	public int applyAsInt(LogMessage message) {
 		int min = 0, max = 0;
 
 		for (LogFilter f : this.children) {
-			int value = f.score(msg);
-			if (value < min)
-				min = value;
-			else if (value > max)
-				max = value;
-		}
-
-		return max > -min ? max : min;
-	}
-
-	@Override
-	public int scoreRaw(String msg) {
-		int min = 0, max = 0;
-
-		for (LogFilter f : this.children) {
-			int value = f.scoreRaw(msg);
+			int value = f.applyAsInt(message);
 			if (value < min)
 				min = value;
 			else if (value > max)

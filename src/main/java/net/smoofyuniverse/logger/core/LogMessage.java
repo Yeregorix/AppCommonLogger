@@ -22,6 +22,8 @@
 
 package net.smoofyuniverse.logger.core;
 
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.time.LocalTime;
 import java.util.function.Supplier;
 
@@ -30,9 +32,9 @@ import java.util.function.Supplier;
  */
 public final class LogMessage {
 	/**
-	 * The time.
+	 * The logger.
 	 */
-	public final LocalTime time;
+	public final ILogger logger;
 
 	/**
 	 * The log level.
@@ -40,40 +42,41 @@ public final class LogMessage {
 	public final LogLevel level;
 
 	/**
-	 * The logger.
+	 * The time.
 	 */
-	public final ILogger logger;
+	public final LocalTime time;
 
 	/**
 	 * The thread.
 	 */
 	public final Thread thread;
 
-	private Supplier<String> supplier;
-	private String text;
+	/**
+	 * The throwable.
+	 */
+	public final Throwable throwable;
 
-	public LogMessage(LogLevel level, ILogger logger, String text) {
-		this(level, logger, Thread.currentThread(), text);
+	private Supplier<String> textSupplier;
+	private String text, stackTrace;
+
+	public LogMessage(ILogger logger, LogLevel level, Throwable throwable, String text) {
+		this(logger, level, LocalTime.now(), Thread.currentThread(), throwable, text);
 	}
 
-	public LogMessage(LogLevel level, ILogger logger, Thread thread, String text) {
-		this(LocalTime.now(), level, logger, thread, text);
-	}
-
-	public LogMessage(LocalTime time, LogLevel level, ILogger logger, Thread thread, String text) {
-		this(time, level, logger, thread);
+	public LogMessage(ILogger logger, LogLevel level, LocalTime time, Thread thread, Throwable throwable, String text) {
+		this(logger, level, time, thread, throwable);
 		if (text == null)
 			throw new IllegalArgumentException("text");
 		this.text = text;
 	}
 
-	private LogMessage(LocalTime time, LogLevel level, ILogger logger, Thread thread) {
-		if (time == null)
-			throw new IllegalArgumentException("time");
-		if (level == null)
-			throw new IllegalArgumentException("level");
+	private LogMessage(ILogger logger, LogLevel level, LocalTime time, Thread thread, Throwable throwable) {
 		if (logger == null)
 			throw new IllegalArgumentException("logger");
+		if (level == null)
+			throw new IllegalArgumentException("level");
+		if (time == null)
+			throw new IllegalArgumentException("time");
 		if (thread == null)
 			throw new IllegalArgumentException("thread");
 
@@ -81,21 +84,18 @@ public final class LogMessage {
 		this.level = level;
 		this.logger = logger;
 		this.thread = thread;
+		this.throwable = throwable;
 	}
 
-	public LogMessage(LogLevel level, ILogger logger, Supplier<String> supplier) {
-		this(level, logger, Thread.currentThread(), supplier);
+	public LogMessage(ILogger logger, LogLevel level, Throwable throwable, Supplier<String> textSupplier) {
+		this(logger, level, LocalTime.now(), Thread.currentThread(), throwable, textSupplier);
 	}
 
-	public LogMessage(LogLevel level, ILogger logger, Thread thread, Supplier<String> supplier) {
-		this(LocalTime.now(), level, logger, thread, supplier);
-	}
-
-	public LogMessage(LocalTime time, LogLevel level, ILogger logger, Thread thread, Supplier<String> supplier) {
-		this(time, level, logger, thread);
-		if (supplier == null)
-			throw new IllegalArgumentException("supplier");
-		this.supplier = supplier;
+	public LogMessage(ILogger logger, LogLevel level, LocalTime time, Thread thread, Throwable throwable, Supplier<String> textSupplier) {
+		this(logger, level, time, thread, throwable);
+		if (textSupplier == null)
+			throw new IllegalArgumentException("textSupplier");
+		this.textSupplier = textSupplier;
 	}
 
 	/**
@@ -106,10 +106,49 @@ public final class LogMessage {
 	 */
 	public String getText() {
 		if (this.text == null) {
-			this.text = this.supplier.get();
+			this.text = this.textSupplier.get();
 			if (this.text == null)
 				this.text = "";
 		}
 		return this.text;
+	}
+
+	/**
+	 * Creates a new log message with the given text.
+	 *
+	 * @param text The text.
+	 * @return The new log message.
+	 */
+	public LogMessage setText(String text) {
+		return new LogMessage(this.logger, this.level, this.time, this.thread, this.throwable, text);
+	}
+
+	/**
+	 * Creates a new log message with the given text supplier.
+	 *
+	 * @param textSupplier The text supplier.
+	 * @return The new log message.
+	 */
+	public LogMessage setText(Supplier<String> textSupplier) {
+		return new LogMessage(this.logger, this.level, this.time, this.thread, this.throwable, textSupplier);
+	}
+
+	/**
+	 * Gets the stack trace.
+	 * Empty if the throwable is null.
+	 *
+	 * @return The stack trace.
+	 */
+	public String getStackTrace() {
+		if (this.stackTrace == null) {
+			if (this.throwable == null) {
+				this.stackTrace = "";
+			} else {
+				StringWriter buffer = new StringWriter();
+				this.throwable.printStackTrace(new PrintWriter(buffer));
+				this.stackTrace = buffer.toString();
+			}
+		}
+		return this.stackTrace;
 	}
 }

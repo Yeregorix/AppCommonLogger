@@ -20,46 +20,24 @@
  * SOFTWARE.
  */
 
-package net.smoofyuniverse.logger.appender;
+package net.smoofyuniverse.logger.appender.string;
 
-import net.smoofyuniverse.logger.core.LogMessage;
+import java.io.Closeable;
+import java.util.function.Consumer;
 
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.concurrent.CopyOnWriteArrayList;
+/**
+ * A string appender.
+ */
+public interface StringAppender extends Consumer<String>, Closeable {
 
-public class ParentAppender implements LogAppender {
-	public final Collection<LogAppender> children;
-
-	public ParentAppender() {
-		this(new CopyOnWriteArrayList<>());
-	}
-
-	public ParentAppender(LogAppender... children) {
-		this(Arrays.asList(children));
-	}
-
-	public ParentAppender(Collection<LogAppender> children) {
-		if (children == null)
-			throw new IllegalArgumentException("children");
-		this.children = children;
-	}
+	/**
+	 * Appends the string message.
+	 *
+	 * @param message The string message.
+	 */
+	@Override
+	void accept(String message);
 
 	@Override
-	public void append(LogMessage msg) {
-		for (LogAppender a : this.children)
-			a.append(msg);
-	}
-
-	@Override
-	public void appendRaw(String msg) {
-		for (LogAppender a : this.children)
-			a.appendRaw(msg);
-	}
-
-	@Override
-	public void close() {
-		for (LogAppender a : this.children)
-			a.close();
-	}
+	default void close() {}
 }

@@ -20,34 +20,28 @@
  * SOFTWARE.
  */
 
-package net.smoofyuniverse.logger.appender;
+package net.smoofyuniverse.logger.appender.string;
 
-import net.smoofyuniverse.logger.core.LogMessage;
-import net.smoofyuniverse.logger.filter.LogFilter;
+import javafx.application.Platform;
+import javafx.scene.control.TextInputControl;
 
-public class FilteredAppender implements LogAppender {
-	public final LogAppender delegate;
-	public final LogFilter filter;
+/**
+ * A {@link StringAppender} writing to a {@link TextInputControl}.
+ */
+public class TextInputControlAppender implements StringAppender {
+	public final TextInputControl textInput;
 
-	public FilteredAppender(LogAppender delegate, LogFilter filter) {
-		if (delegate == null)
-			throw new IllegalArgumentException("delegate");
-		if (filter == null)
-			throw new IllegalArgumentException("filter");
-
-		this.delegate = delegate;
-		this.filter = filter;
+	public TextInputControlAppender(TextInputControl textInput) {
+		if (textInput == null)
+			throw new IllegalArgumentException("textInput");
+		this.textInput = textInput;
 	}
 
 	@Override
-	public void append(LogMessage msg) {
-		if (this.filter.score(msg) >= 0)
-			this.delegate.append(msg);
-	}
-
-	@Override
-	public void appendRaw(String msg) {
-		if (this.filter.scoreRaw(msg) >= 0)
-			this.delegate.appendRaw(msg);
+	public void accept(String message) {
+		if (Platform.isFxApplicationThread())
+			this.textInput.appendText(message);
+		else
+			Platform.runLater(() -> this.textInput.appendText(message));
 	}
 }

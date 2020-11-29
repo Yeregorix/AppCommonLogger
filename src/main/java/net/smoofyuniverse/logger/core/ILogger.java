@@ -22,7 +22,6 @@
 
 package net.smoofyuniverse.logger.core;
 
-import java.time.LocalTime;
 import java.util.function.Supplier;
 
 /**
@@ -45,49 +44,35 @@ public interface ILogger {
 	 */
 	boolean isActive(LogLevel level);
 
-	default void log(LogLevel level, String text) {
-		log(new LogMessage(level, this, text), null);
-	}
-
-	default void log(LogLevel level, Thread thread, String text, Throwable throwable) {
-		log(new LogMessage(level, this, thread, text), throwable);
-	}
-
-	default void log(LogLevel level, Throwable throwable) {
-		log(new LogMessage(level, this, "An error occurred."), throwable);
-	}
-
-	default void log(LogLevel level, String text, Throwable throwable) {
-		log(new LogMessage(level, this, text), throwable);
+	default void log(LogLevel level, Supplier<String> textSupplier) {
+		log(new LogMessage(this, level, null, textSupplier));
 	}
 
 	/**
 	 * Logs the message.
-	 * Logs the throwable if not null.
 	 *
-	 * @param msg       The message.
-	 * @param throwable The throwable.
+	 * @param message The message.
 	 */
-	void log(LogMessage msg, Throwable throwable);
+	void log(LogMessage message);
 
-	default void log(LogLevel level, Thread thread, Supplier<String> supplier, Throwable throwable) {
-		log(new LogMessage(level, this, thread, supplier), throwable);
+	default void log(LogLevel level, String text) {
+		log(new LogMessage(this, level, null, text));
 	}
 
-	default void log(LocalTime time, LogLevel level, Thread thread, Supplier<String> supplier, Throwable throwable) {
-		log(new LogMessage(time, level, this, thread, supplier), throwable);
+	default void log(LogLevel level, Throwable throwable) {
+		log(new LogMessage(this, level, throwable, "An error occurred."));
 	}
 
-	default void log(LocalTime time, LogLevel level, Thread thread, String text, Throwable throwable) {
-		log(new LogMessage(time, level, this, thread, text), throwable);
+	default void log(LogLevel level, Supplier<String> textSupplier, Throwable throwable) {
+		log(new LogMessage(this, level, throwable, textSupplier));
+	}
+
+	default void log(LogLevel level, String text, Throwable throwable) {
+		log(new LogMessage(this, level, throwable, text));
 	}
 
 	default void trace(Supplier<String> supplier) {
 		log(LogLevel.TRACE, supplier);
-	}
-
-	default void log(LogLevel level, Supplier<String> supplier) {
-		log(new LogMessage(level, this, supplier), null);
 	}
 
 	default void trace(String text) {
@@ -104,10 +89,6 @@ public interface ILogger {
 
 	default void trace(String text, Throwable throwable) {
 		log(LogLevel.TRACE, text, throwable);
-	}
-
-	default void log(LogLevel level, Supplier<String> supplier, Throwable throwable) {
-		log(new LogMessage(level, this, supplier), throwable);
 	}
 
 	default void debug(String text) {

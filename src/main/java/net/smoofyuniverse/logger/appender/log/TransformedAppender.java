@@ -20,19 +20,27 @@
  * SOFTWARE.
  */
 
-package net.smoofyuniverse.logger.appender;
+package net.smoofyuniverse.logger.appender.log;
 
 import net.smoofyuniverse.logger.core.LogMessage;
+import net.smoofyuniverse.logger.transformer.LogTransformer;
 
-public interface LogAppender {
+public class TransformedAppender implements LogAppender {
+	public final LogAppender delegate;
+	public final LogTransformer transformer;
 
-	default void append(LogMessage msg) {
-		appendRaw(msg.getText() + System.lineSeparator());
+	public TransformedAppender(LogAppender delegate, LogTransformer transformer) {
+		if (delegate == null)
+			throw new IllegalArgumentException("delegate");
+		if (transformer == null)
+			throw new IllegalArgumentException("transformer");
+
+		this.delegate = delegate;
+		this.transformer = transformer;
 	}
 
-	default void appendRaw(String msg) {
-		throw new UnsupportedOperationException("Raw message not supported");
+	@Override
+	public void accept(LogMessage message) {
+		this.delegate.accept(this.transformer.apply(message));
 	}
-
-	default void close() {}
 }

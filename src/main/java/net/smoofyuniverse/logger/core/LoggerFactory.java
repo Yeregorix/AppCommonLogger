@@ -22,7 +22,7 @@
 
 package net.smoofyuniverse.logger.core;
 
-import net.smoofyuniverse.logger.appender.LogAppender;
+import net.smoofyuniverse.logger.appender.log.LogAppender;
 
 import java.util.Collections;
 import java.util.Map;

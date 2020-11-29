@@ -20,33 +20,33 @@
  * SOFTWARE.
  */
 
-package net.smoofyuniverse.logger.appender;
+package net.smoofyuniverse.logger.appender.string;
 
-import net.smoofyuniverse.logger.core.LogMessage;
+import java.io.PrintStream;
 
-import java.util.function.Function;
+/**
+ * A {@link StringAppender} writing to a {@link PrintStream}.
+ */
+public class PrintStreamAppender implements StringAppender {
+	public final PrintStream stream;
 
-public class FormattedAppender implements LogAppender {
-	public final LogAppender delegate;
-	public final Function<LogMessage, String> formatter;
-
-	public FormattedAppender(LogAppender delegate, Function<LogMessage, String> formatter) {
-		if (delegate == null)
-			throw new IllegalArgumentException("delegate");
-		if (formatter == null)
-			throw new IllegalArgumentException("formatter");
-
-		this.delegate = delegate;
-		this.formatter = formatter;
+	public PrintStreamAppender(PrintStream stream) {
+		if (stream == null)
+			throw new IllegalArgumentException("stream");
+		this.stream = stream;
 	}
 
 	@Override
-	public void append(LogMessage msg) {
-		this.delegate.appendRaw(this.formatter.apply(msg));
+	public void accept(String message) {
+		this.stream.print(message);
 	}
 
 	@Override
-	public void appendRaw(String msg) {
-		this.delegate.appendRaw(msg);
+	public void close() {
+		this.stream.close();
+	}
+
+	public static PrintStreamAppender system() {
+		return new PrintStreamAppender(System.out);
 	}
 }

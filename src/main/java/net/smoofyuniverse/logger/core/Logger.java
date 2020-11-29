@@ -22,10 +22,8 @@
 
 package net.smoofyuniverse.logger.core;
 
-import net.smoofyuniverse.logger.appender.LogAppender;
+import net.smoofyuniverse.logger.appender.log.LogAppender;
 
-import java.io.PrintWriter;
-import java.io.StringWriter;
 import java.util.Optional;
 
 /**
@@ -103,15 +101,8 @@ public final class Logger implements ILogger {
 	}
 
 	@Override
-	public void log(LogMessage msg, Throwable throwable) {
-		if (!isActive(msg.level))
-			return;
-
-		this.appender.append(msg);
-		if (throwable != null) {
-			StringWriter buffer = new StringWriter();
-			throwable.printStackTrace(new PrintWriter(buffer));
-			this.appender.appendRaw(buffer.toString());
-		}
+	public void log(LogMessage message) {
+		if (isActive(message.level))
+			this.appender.accept(message);
 	}
 }

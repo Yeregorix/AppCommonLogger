@@ -20,34 +20,28 @@
  * SOFTWARE.
  */
 
-package net.smoofyuniverse.logger.transformer;
+package net.smoofyuniverse.logger.appender.log;
 
 import net.smoofyuniverse.logger.core.LogMessage;
+import net.smoofyuniverse.logger.filter.LogFilter;
 
-import java.util.function.UnaryOperator;
+public class FilteredAppender implements LogAppender {
+	public final LogAppender delegate;
+	public final LogFilter filter;
 
-/**
- * A log transformer.
- */
-public interface LogTransformer extends UnaryOperator<LogMessage> {
+	public FilteredAppender(LogAppender delegate, LogFilter filter) {
+		if (delegate == null)
+			throw new IllegalArgumentException("delegate");
+		if (filter == null)
+			throw new IllegalArgumentException("filter");
 
-	/**
-	 * Transforms the log messsage.
-	 *
-	 * @param originalMessage The original log message.
-	 * @param currentMessage  The current log message.
-	 * @return The transformed log message.
-	 */
-	default LogMessage apply(LogMessage originalMessage, LogMessage currentMessage) {
-		return apply(currentMessage);
+		this.delegate = delegate;
+		this.filter = filter;
 	}
 
-	/**
-	 * Transforms the log messsage.
-	 *
-	 * @param message The log message.
-	 * @return The transformed log message.
-	 */
 	@Override
-	LogMessage apply(LogMessage message);
+	public void accept(LogMessage message) {
+		if (this.filter.test(message))
+			this.delegate.accept(message);
+	}
 }

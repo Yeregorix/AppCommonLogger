@@ -20,7 +20,7 @@
  * SOFTWARE.
  */
 
-package net.smoofyuniverse.logger.appender;
+package net.smoofyuniverse.logger.appender.string;
 
 import java.io.BufferedWriter;
 import java.io.IOException;
@@ -35,7 +35,7 @@ import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.util.TreeMap;
 
-public final class DatedRollingFileAppender implements LogAppender {
+public final class DatedRollingFileAppender implements StringAppender {
 	public static final DateTimeFormatter DEFAULT_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 	public static final Clock DEFAULT_CLOCK = Clock.systemDefaultZone();
 
@@ -75,11 +75,12 @@ public final class DatedRollingFileAppender implements LogAppender {
 	}
 
 	@Override
-	public void appendRaw(String msg) {
+	public void accept(String message) {
 		try {
 			if (update())
 				cleanup();
-			getWriter().write(msg);
+
+			getWriter().write(message);
 			this.writer.flush();
 		} catch (Exception e) {
 			throw e instanceof RuntimeException ? (RuntimeException) e : new RuntimeException(e);

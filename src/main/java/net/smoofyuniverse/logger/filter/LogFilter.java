@@ -24,28 +24,35 @@ package net.smoofyuniverse.logger.filter;
 
 import net.smoofyuniverse.logger.core.LogMessage;
 
+import java.util.function.Predicate;
+import java.util.function.ToIntFunction;
+
 /**
  * A log filter.
- * Filters log messages and raw messages.
  * <p>
  * Computes an integer value.
  * If the value is positive, the message is allowed.
  * If the value is strictly negative, the message is denied.
  */
-public interface LogFilter {
-	/**
-	 * Gets log message score for this filter.
-	 *
-	 * @param msg The log message.
-	 * @return The score.
-	 */
-	int score(LogMessage msg);
+public interface LogFilter extends ToIntFunction<LogMessage>, Predicate<LogMessage> {
 
 	/**
-	 * Gets raw message score for this filter.
+	 * Gets whether this log message is allowed.
 	 *
-	 * @param msg The raw message.
+	 * @param message The log message.
+	 * @return Whether this log message is allowed.
+	 */
+	@Override
+	default boolean test(LogMessage message) {
+		return applyAsInt(message) >= 0;
+	}
+
+	/**
+	 * Gets score for this log message.
+	 *
+	 * @param message The log message.
 	 * @return The score.
 	 */
-	int scoreRaw(String msg);
+	@Override
+	int applyAsInt(LogMessage message);
 }

@@ -22,6 +22,8 @@
 
 package net.smoofyuniverse.logger.transformer;
 
+import net.smoofyuniverse.logger.core.LogMessage;
+
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.concurrent.CopyOnWriteArrayList;
@@ -50,14 +52,14 @@ public class ParentTransformer implements LogTransformer {
 	}
 
 	@Override
-	public String apply(String originalRawMsg, String currentRawMsg) {
+	public LogMessage apply(LogMessage originalMessage, LogMessage currentMessage) {
 		for (LogTransformer t : this.children)
-			currentRawMsg = t.apply(originalRawMsg, currentRawMsg);
-		return currentRawMsg;
+			currentMessage = t.apply(originalMessage, currentMessage);
+		return currentMessage;
 	}
 
 	@Override
-	public String apply(String rawMsg) {
-		return apply(rawMsg, rawMsg);
+	public LogMessage apply(LogMessage message) {
+		return apply(message, message);
 	}
 }

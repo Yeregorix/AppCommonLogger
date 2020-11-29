@@ -20,25 +20,40 @@
  * SOFTWARE.
  */
 
-package net.smoofyuniverse.logger.appender;
+package net.smoofyuniverse.logger.appender.log;
 
-import javafx.application.Platform;
-import javafx.scene.control.TextInputControl;
+import net.smoofyuniverse.logger.core.LogMessage;
 
-public class TextInputControlAppender implements LogAppender {
-	public final TextInputControl textInput;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.concurrent.CopyOnWriteArrayList;
 
-	public TextInputControlAppender(TextInputControl textInput) {
-		if (textInput == null)
-			throw new IllegalArgumentException("textInput");
-		this.textInput = textInput;
+public class ParentLogAppender implements LogAppender {
+	public final Collection<LogAppender> children;
+
+	public ParentLogAppender() {
+		this(new CopyOnWriteArrayList<>());
+	}
+
+	public ParentLogAppender(Collection<LogAppender> children) {
+		if (children == null)
+			throw new IllegalArgumentException("children");
+		this.children = children;
+	}
+
+	public ParentLogAppender(LogAppender... children) {
+		this(Arrays.asList(children));
 	}
 
 	@Override
-	public void appendRaw(String msg) {
-		if (Platform.isFxApplicationThread())
-			this.textInput.appendText(msg);
-		else
-			Platform.runLater(() -> this.textInput.appendText(msg));
+	public void accept(LogMessage message) {
+		for (LogAppender a : this.children)
+			a.accept(message);
+	}
+
+	@Override
+	public void close() {
+		for (LogAppender a : this.children)
+			a.close();
 	}
 }

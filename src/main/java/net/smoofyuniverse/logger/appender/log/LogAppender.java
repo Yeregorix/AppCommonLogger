@@ -20,30 +20,26 @@
  * SOFTWARE.
  */
 
-package net.smoofyuniverse.logger.appender;
+package net.smoofyuniverse.logger.appender.log;
 
-import java.io.PrintStream;
+import net.smoofyuniverse.logger.core.LogMessage;
 
-public class PrintStreamAppender implements LogAppender {
-	public final PrintStream stream;
+import java.io.Closeable;
+import java.util.function.Consumer;
 
-	public PrintStreamAppender(PrintStream stream) {
-		if (stream == null)
-			throw new IllegalArgumentException("stream");
-		this.stream = stream;
-	}
+/**
+ * A log appender.
+ */
+public interface LogAppender extends Consumer<LogMessage>, Closeable {
+
+	/**
+	 * Appends the log message.
+	 *
+	 * @param message The log message.
+	 */
+	@Override
+	void accept(LogMessage message);
 
 	@Override
-	public void appendRaw(String msg) {
-		this.stream.print(msg);
-	}
-
-	@Override
-	public void close() {
-		this.stream.close();
-	}
-
-	public static PrintStreamAppender system() {
-		return new PrintStreamAppender(System.out);
-	}
+	default void close() {}
 }

@@ -20,26 +20,29 @@
  * SOFTWARE.
  */
 
-package net.smoofyuniverse.logger.appender;
+package net.smoofyuniverse.logger.appender.log;
 
-import net.smoofyuniverse.logger.transformer.LogTransformer;
+import net.smoofyuniverse.logger.appender.string.StringAppender;
+import net.smoofyuniverse.logger.core.LogMessage;
 
-public class TransformedAppender implements LogAppender {
-	public final LogAppender delegate;
-	public final LogTransformer transformer;
+import java.util.function.Function;
 
-	public TransformedAppender(LogAppender delegate, LogTransformer transformer) {
-		if (delegate == null)
-			throw new IllegalArgumentException("delegate");
-		if (transformer == null)
-			throw new IllegalArgumentException("transformer");
+public class FormattedAppender implements LogAppender {
+	public final StringAppender stringAppender;
+	public final Function<LogMessage, String> formatter;
 
-		this.delegate = delegate;
-		this.transformer = transformer;
+	public FormattedAppender(StringAppender stringAppender, Function<LogMessage, String> formatter) {
+		if (stringAppender == null)
+			throw new IllegalArgumentException("stringAppender");
+		if (formatter == null)
+			throw new IllegalArgumentException("formatter");
+
+		this.stringAppender = stringAppender;
+		this.formatter = formatter;
 	}
 
 	@Override
-	public void appendRaw(String msg) {
-		this.delegate.appendRaw(this.transformer.apply(msg));
+	public void accept(LogMessage message) {
+		this.stringAppender.accept(this.formatter.apply(message));
 	}
 }

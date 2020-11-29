@@ -20,34 +20,38 @@
  * SOFTWARE.
  */
 
-package net.smoofyuniverse.logger.transformer;
+package net.smoofyuniverse.logger.appender.string;
 
-import net.smoofyuniverse.logger.core.LogMessage;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.concurrent.CopyOnWriteArrayList;
 
-import java.util.function.UnaryOperator;
+public class ParentStringAppender implements StringAppender {
+	public final Collection<StringAppender> children;
 
-/**
- * A log transformer.
- */
-public interface LogTransformer extends UnaryOperator<LogMessage> {
-
-	/**
-	 * Transforms the log messsage.
-	 *
-	 * @param originalMessage The original log message.
-	 * @param currentMessage  The current log message.
-	 * @return The transformed log message.
-	 */
-	default LogMessage apply(LogMessage originalMessage, LogMessage currentMessage) {
-		return apply(currentMessage);
+	public ParentStringAppender() {
+		this(new CopyOnWriteArrayList<>());
 	}
 
-	/**
-	 * Transforms the log messsage.
-	 *
-	 * @param message The log message.
-	 * @return The transformed log message.
-	 */
+	public ParentStringAppender(Collection<StringAppender> children) {
+		if (children == null)
+			throw new IllegalArgumentException("children");
+		this.children = children;
+	}
+
+	public ParentStringAppender(StringAppender... children) {
+		this(Arrays.asList(children));
+	}
+
 	@Override
-	LogMessage apply(LogMessage message);
+	public void accept(String message) {
+		for (StringAppender a : this.children)
+			a.accept(message);
+	}
+
+	@Override
+	public void close() {
+		for (StringAppender a : this.children)
+			a.close();
+	}
 }

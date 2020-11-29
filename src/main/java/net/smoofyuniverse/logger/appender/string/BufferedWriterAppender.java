@@ -20,47 +20,31 @@
  * SOFTWARE.
  */
 
-package net.smoofyuniverse.logger.appender;
+package net.smoofyuniverse.logger.appender.string;
 
 import java.io.BufferedWriter;
 import java.io.IOException;
-import java.nio.charset.Charset;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.StandardOpenOption;
 
-public class FileAppender implements LogAppender {
-	private BufferedWriter writer;
+/**
+ * A {@link StringAppender} writing to a {@link BufferedWriter}.
+ */
+public class BufferedWriterAppender implements StringAppender {
+	public final BufferedWriter writer;
+	private boolean closed = false;
 
-	public final StandardOpenOption[] options;
-	public final Charset charset;
-	public final Path file;
-
-	public FileAppender(Path file, StandardOpenOption... options) {
-		this(file, StandardCharsets.UTF_8, options);
-	}
-
-	public FileAppender(Path file, Charset charset, StandardOpenOption... options) {
-		if (file == null)
-			throw new IllegalArgumentException("file");
-		if (charset == null)
-			throw new IllegalArgumentException("charset");
-		if (options == null)
-			throw new IllegalArgumentException("options");
-
-		this.file = file;
-		this.charset = charset;
-		this.options = options;
+	public BufferedWriterAppender(BufferedWriter writer) {
+		if (writer == null)
+			throw new IllegalArgumentException("writer");
+		this.writer = writer;
 	}
 
 	@Override
-	public void appendRaw(String msg) {
-		try {
-			if (this.writer == null)
-				this.writer = Files.newBufferedWriter(this.file, this.charset, this.options);
+	public void accept(String message) {
+		if (this.closed)
+			return;
 
-			this.writer.write(msg);
+		try {
+			this.writer.write(message);
 			this.writer.flush();
 		} catch (IOException e) {
 			throw new RuntimeException(e);
@@ -69,10 +53,14 @@ public class FileAppender implements LogAppender {
 
 	@Override
 	public void close() {
+		if (this.closed)
+			return;
+
 		try {
 			this.writer.close();
 		} catch (IOException ignored) {
 		}
-		this.writer = null;
+
+		this.closed = true;
 	}
 }

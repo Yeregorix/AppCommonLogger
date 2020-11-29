@@ -26,7 +26,13 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.concurrent.CopyOnWriteArrayList;
 
+/**
+ * A {@link LogTransformer} chaining child transformers.
+ */
 public class ParentTransformer implements LogTransformer {
+	/**
+	 * The children.
+	 */
 	public final Collection<LogTransformer> children;
 
 	public ParentTransformer() {
@@ -44,14 +50,14 @@ public class ParentTransformer implements LogTransformer {
 	}
 
 	@Override
-	public String accept(String originalRawMsg, String currentRawMsg) {
+	public String apply(String originalRawMsg, String currentRawMsg) {
 		for (LogTransformer t : this.children)
-			currentRawMsg = t.accept(originalRawMsg, currentRawMsg);
+			currentRawMsg = t.apply(originalRawMsg, currentRawMsg);
 		return currentRawMsg;
 	}
 
 	@Override
-	public String accept(String rawMsg) {
-		return accept(rawMsg, rawMsg);
+	public String apply(String rawMsg) {
+		return apply(rawMsg, rawMsg);
 	}
 }

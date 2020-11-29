@@ -22,11 +22,31 @@
 
 package net.smoofyuniverse.logger.transformer;
 
-public interface LogTransformer {
+import java.util.function.UnaryOperator;
 
-	default String accept(String originalRawMsg, String currentRawMsg) {
-		return accept(currentRawMsg);
+/**
+ * A log transformer.
+ * Transforms raw messages.
+ */
+public interface LogTransformer extends UnaryOperator<String> {
+
+	/**
+	 * Transforms the raw messsage.
+	 *
+	 * @param originalRawMsg The original raw message.
+	 * @param currentRawMsg  The current raw message.
+	 * @return The transformed raw message.
+	 */
+	default String apply(String originalRawMsg, String currentRawMsg) {
+		return apply(currentRawMsg);
 	}
 
-	String accept(String rawMsg);
+	/**
+	 * Transforms the raw messsage.
+	 *
+	 * @param rawMsg The raw message.
+	 * @return The transformed raw message.
+	 */
+	@Override
+	String apply(String rawMsg);
 }

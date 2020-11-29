@@ -40,6 +40,6 @@ public class TransformedAppender implements LogAppender {
 
 	@Override
 	public void appendRaw(String msg) {
-		this.delegate.appendRaw(this.transformer.accept(msg));
+		this.delegate.appendRaw(this.transformer.apply(msg));
 	}
 }

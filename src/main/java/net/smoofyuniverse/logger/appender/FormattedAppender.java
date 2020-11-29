@@ -23,13 +23,14 @@
 package net.smoofyuniverse.logger.appender;
 
 import net.smoofyuniverse.logger.core.LogMessage;
-import net.smoofyuniverse.logger.formatter.LogFormatter;
+
+import java.util.function.Function;
 
 public class FormattedAppender implements LogAppender {
 	public final LogAppender delegate;
-	public final LogFormatter formatter;
+	public final Function<LogMessage, String> formatter;
 
-	public FormattedAppender(LogAppender delegate, LogFormatter formatter) {
+	public FormattedAppender(LogAppender delegate, Function<LogMessage, String> formatter) {
 		if (delegate == null)
 			throw new IllegalArgumentException("delegate");
 		if (formatter == null)
@@ -41,7 +42,7 @@ public class FormattedAppender implements LogAppender {
 
 	@Override
 	public void append(LogMessage msg) {
-		this.delegate.appendRaw(this.formatter.accept(msg));
+		this.delegate.appendRaw(this.formatter.apply(msg));
 	}
 
 	@Override

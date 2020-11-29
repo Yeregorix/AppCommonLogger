@@ -28,9 +28,16 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.concurrent.CopyOnWriteArrayList;
 
+/**
+ * A {@link LogFilter} combining child filters.
+ * The score with the highest absolute value is retained.
+ * When two opposite scores have the same absolute value, the negative one is preferred.
+ */
 public class ParentFilter implements LogFilter {
+	/**
+	 * The children.
+	 */
 	public final Collection<LogFilter> children;
-	public boolean dominantValue = false;
 
 	public ParentFilter() {
 		this(new CopyOnWriteArrayList<>());
@@ -47,20 +54,32 @@ public class ParentFilter implements LogFilter {
 	}
 
 	@Override
-	public boolean allow(LogMessage msg) {
+	public int score(LogMessage msg) {
+		int min = 0, max = 0;
+
 		for (LogFilter f : this.children) {
-			if (f.allow(msg) == this.dominantValue)
-				return this.dominantValue;
+			int value = f.score(msg);
+			if (value < min)
+				min = value;
+			else if (value > max)
+				max = value;
 		}
-		return !this.dominantValue;
+
+		return max > -min ? max : min;
 	}
 
 	@Override
-	public boolean allowRaw(String msg) {
+	public int scoreRaw(String msg) {
+		int min = 0, max = 0;
+
 		for (LogFilter f : this.children) {
-			if (f.allowRaw(msg) == this.dominantValue)
-				return this.dominantValue;
+			int value = f.scoreRaw(msg);
+			if (value < min)
+				min = value;
+			else if (value > max)
+				max = value;
 		}
-		return !this.dominantValue;
+
+		return max > -min ? max : min;
 	}
 }

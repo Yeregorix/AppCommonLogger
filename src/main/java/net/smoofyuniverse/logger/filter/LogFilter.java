@@ -24,30 +24,28 @@ package net.smoofyuniverse.logger.filter;
 
 import net.smoofyuniverse.logger.core.LogMessage;
 
+/**
+ * A log filter.
+ * Filters log messages and raw messages.
+ * <p>
+ * Computes an integer value.
+ * If the value is positive, the message is allowed.
+ * If the value is strictly negative, the message is denied.
+ */
 public interface LogFilter {
-	LogFilter DENY_ALL = new LogFilter() {
-		@Override
-		public boolean allow(LogMessage msg) {
-			return false;
-		}
+	/**
+	 * Gets log message score for this filter.
+	 *
+	 * @param msg The log message.
+	 * @return The score.
+	 */
+	int score(LogMessage msg);
 
-		@Override
-		public boolean allowRaw(String msg) {
-			return false;
-		}
-	}, ALLOW_ALL = new LogFilter() {
-		@Override
-		public boolean allow(LogMessage msg) {
-			return true;
-		}
-
-		@Override
-		public boolean allowRaw(String msg) {
-			return true;
-		}
-	};
-
-	boolean allow(LogMessage msg);
-
-	boolean allowRaw(String msg);
+	/**
+	 * Gets raw message score for this filter.
+	 *
+	 * @param msg The raw message.
+	 * @return The score.
+	 */
+	int scoreRaw(String msg);
 }

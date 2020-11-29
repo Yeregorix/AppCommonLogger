@@ -41,13 +41,13 @@ public class FilteredAppender implements LogAppender {
 
 	@Override
 	public void append(LogMessage msg) {
-		if (this.filter.allow(msg))
+		if (this.filter.score(msg) >= 0)
 			this.delegate.append(msg);
 	}
 
 	@Override
 	public void appendRaw(String msg) {
-		if (this.filter.allowRaw(msg))
+		if (this.filter.scoreRaw(msg) >= 0)
 			this.delegate.appendRaw(msg);
 	}
 }

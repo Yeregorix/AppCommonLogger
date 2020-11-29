@@ -43,7 +43,13 @@ public class FormattedAppender implements LogAppender {
 
 	@Override
 	public void accept(LogMessage message) {
-		this.stringAppender.accept(this.formatter.apply(message));
+		acceptString(this.formatter.apply(message));
+		acceptString(message.getStackTrace());
+	}
+
+	private void acceptString(String message) {
+		if (!message.isEmpty())
+			this.stringAppender.accept(message);
 	}
 
 	@Override

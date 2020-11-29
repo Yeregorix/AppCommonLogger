@@ -26,6 +26,7 @@ import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.time.LocalTime;
 import java.util.function.Supplier;
+import java.util.function.UnaryOperator;
 
 /**
  * A data structure representing a log message.
@@ -55,9 +56,10 @@ public final class LogMessage {
 	 * The throwable.
 	 */
 	public final Throwable throwable;
+	private String stackTrace;
 
 	private Supplier<String> textSupplier;
-	private String text, stackTrace;
+	private String text;
 
 	public LogMessage(ILogger logger, LogLevel level, Throwable throwable, String text) {
 		this(logger, level, LocalTime.now(), Thread.currentThread(), throwable, text);
@@ -68,6 +70,11 @@ public final class LogMessage {
 		if (text == null)
 			throw new IllegalArgumentException("text");
 		this.text = text;
+	}
+
+	public LogMessage(ILogger logger, LogLevel level, LocalTime time, Thread thread, Throwable throwable, String text, String stackTrace) {
+		this(logger, level, time, thread, throwable, text);
+		this.stackTrace = stackTrace;
 	}
 
 	private LogMessage(ILogger logger, LogLevel level, LocalTime time, Thread thread, Throwable throwable) {
@@ -98,6 +105,11 @@ public final class LogMessage {
 		this.textSupplier = textSupplier;
 	}
 
+	public LogMessage(ILogger logger, LogLevel level, LocalTime time, Thread thread, Throwable throwable, Supplier<String> textSupplier, String stackTrace) {
+		this(logger, level, time, thread, throwable, textSupplier);
+		this.stackTrace = stackTrace;
+	}
+
 	/**
 	 * Gets the text.
 	 * This method may lazy-initialize the text from a supplier.
@@ -114,28 +126,20 @@ public final class LogMessage {
 	}
 
 	/**
-	 * Creates a new log message with the given text.
+	 * Transforms text and stack trace.
 	 *
-	 * @param text The text.
+	 * @param transformer The transformer.
 	 * @return The new log message.
 	 */
-	public LogMessage setText(String text) {
-		return new LogMessage(this.logger, this.level, this.time, this.thread, this.throwable, text);
-	}
-
-	/**
-	 * Creates a new log message with the given text supplier.
-	 *
-	 * @param textSupplier The text supplier.
-	 * @return The new log message.
-	 */
-	public LogMessage setText(Supplier<String> textSupplier) {
-		return new LogMessage(this.logger, this.level, this.time, this.thread, this.throwable, textSupplier);
+	public LogMessage transform(UnaryOperator<String> transformer) {
+		return new LogMessage(this.logger, this.level, this.time, this.thread, this.throwable,
+				transformer.apply(getText()), transformer.apply(getStackTrace()));
 	}
 
 	/**
 	 * Gets the stack trace.
-	 * Empty if the throwable is null.
+	 * This method may lazy-initialize the stack trace from the throwable.
+	 * Stack trace may be set even when the throwable is null.
 	 *
 	 * @return The stack trace.
 	 */

@@ -28,6 +28,9 @@ import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.Optional;
 
+/**
+ * Default implementation of a {@link Logger}.
+ */
 public final class Logger implements ILogger {
 	private final LoggerFactory factory;
 	private final LogAppender appender;
@@ -45,6 +48,12 @@ public final class Logger implements ILogger {
 		this.name = name;
 	}
 
+	/**
+	 * Creates a standalone logger.
+	 *
+	 * @param appender The log appender.
+	 * @param name     The name.
+	 */
 	public Logger(LogAppender appender, String name) {
 		if (appender == null || name == null)
 			throw new IllegalArgumentException();
@@ -54,14 +63,29 @@ public final class Logger implements ILogger {
 		this.name = name;
 	}
 
+	/**
+	 * Gets the level.
+	 *
+	 * @return The level.
+	 */
 	public Optional<LogLevel> getLevel() {
 		return Optional.ofNullable(this.level);
 	}
 
+	/**
+	 * Sets the level.
+	 *
+	 * @param level The level.
+	 */
 	public void setLevel(LogLevel level) {
 		this.level = level;
 	}
 
+	/**
+	 * Gets the factory this logger is from.
+	 *
+	 * @return The factory.
+	 */
 	public Optional<LoggerFactory> getFactory() {
 		return Optional.ofNullable(this.factory);
 	}

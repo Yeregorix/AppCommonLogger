@@ -25,10 +25,24 @@ package net.smoofyuniverse.logger.core;
 import java.time.LocalTime;
 import java.util.function.Supplier;
 
+/**
+ * A logger.
+ */
 public interface ILogger {
 
+	/**
+	 * Gets the name.
+	 *
+	 * @return The name.
+	 */
 	String getName();
 
+	/**
+	 * Gets whether the level is active.
+	 *
+	 * @param level The level.
+	 * @return Whether the level is active.
+	 */
 	boolean isActive(LogLevel level);
 
 	default void log(LogLevel level, String text) {
@@ -47,6 +61,13 @@ public interface ILogger {
 		log(new LogMessage(level, this, text), throwable);
 	}
 
+	/**
+	 * Logs the message.
+	 * Logs the throwable if not null.
+	 *
+	 * @param msg       The message.
+	 * @param throwable The throwable.
+	 */
 	void log(LogMessage msg, Throwable throwable);
 
 	default void log(LogLevel level, Thread thread, Supplier<String> supplier, Throwable throwable) {

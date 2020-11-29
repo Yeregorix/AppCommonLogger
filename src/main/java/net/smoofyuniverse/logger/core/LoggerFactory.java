@@ -29,33 +29,69 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 
+/**
+ * A logger factory.
+ */
 public class LoggerFactory {
 	private final Map<String, Logger> loggers = new ConcurrentHashMap<>(), unmodifiableLoggers = Collections.unmodifiableMap(this.loggers);
 	private final LogAppender appender;
 	private LogLevel level = LogLevel.TRACE;
 
+	/**
+	 * Creates a logger factory.
+	 *
+	 * @param appender The log appender.
+	 */
 	public LoggerFactory(LogAppender appender) {
 		if (appender == null)
 			throw new IllegalArgumentException("appender");
 		this.appender = appender;
 	}
 
+	/**
+	 * Gets the level.
+	 *
+	 * @return The level.
+	 */
 	public LogLevel getLevel() {
 		return this.level;
 	}
 
+	/**
+	 * Sets the level.
+	 *
+	 * @param level The level.
+	 */
 	public void setLevel(LogLevel level) {
 		this.level = level;
 	}
 
+	/**
+	 * Gets whether the level is active.
+	 *
+	 * @param level The level.
+	 * @return Whether the level is active.
+	 */
 	public boolean isActive(LogLevel level) {
 		return level.ordinal() >= this.level.ordinal();
 	}
 
+	/**
+	 * Gets the appender.
+	 *
+	 * @return The appender.
+	 */
 	public LogAppender getAppender() {
 		return this.appender;
 	}
 
+	/**
+	 * Gets the logger for the given name.
+	 * Creates it if needed.
+	 *
+	 * @param name The name.
+	 * @return The logger.
+	 */
 	public Logger provideLogger(String name) {
 		if (name == null)
 			throw new IllegalArgumentException();
@@ -68,6 +104,12 @@ public class LoggerFactory {
 		return l;
 	}
 
+	/**
+	 * Gets the logger for the given name if existing.
+	 *
+	 * @param name The name.
+	 * @return The logger.
+	 */
 	public Optional<Logger> getLogger(String name) {
 		if (name == null)
 			throw new IllegalArgumentException();
@@ -75,6 +117,11 @@ public class LoggerFactory {
 		return Optional.ofNullable(this.loggers.get(name));
 	}
 
+	/**
+	 * Gets all existing loggers.
+	 *
+	 * @return The loggers.
+	 */
 	public Map<String, Logger> getLoggers() {
 		return this.unmodifiableLoggers;
 	}

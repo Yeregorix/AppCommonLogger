@@ -25,10 +25,28 @@ package net.smoofyuniverse.logger.core;
 import java.time.LocalTime;
 import java.util.function.Supplier;
 
+/**
+ * A data structure representing a log message.
+ */
 public final class LogMessage {
+	/**
+	 * The time.
+	 */
 	public final LocalTime time;
+
+	/**
+	 * The log level.
+	 */
 	public final LogLevel level;
+
+	/**
+	 * The logger.
+	 */
 	public final ILogger logger;
+
+	/**
+	 * The thread.
+	 */
 	public final Thread thread;
 
 	private Supplier<String> supplier;
@@ -80,6 +98,12 @@ public final class LogMessage {
 		this.supplier = supplier;
 	}
 
+	/**
+	 * Gets the text.
+	 * This method may lazy-initialize the text from a supplier.
+	 *
+	 * @return The text.
+	 */
 	public String getText() {
 		if (this.text == null) {
 			this.text = this.supplier.get();

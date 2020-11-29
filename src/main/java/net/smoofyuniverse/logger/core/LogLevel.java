@@ -22,6 +22,9 @@
 
 package net.smoofyuniverse.logger.core;
 
+/**
+ * A log level.
+ */
 public enum LogLevel {
 	TRACE, DEBUG, INFO, WARN, ERROR
 }

@@ -41,5 +41,5 @@ public interface LogAppender extends Consumer<LogMessage>, Closeable {
 	void accept(LogMessage message);
 
 	@Override
-	default void close() {}
+	void close();
 }

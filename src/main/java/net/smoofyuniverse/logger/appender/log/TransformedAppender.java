@@ -43,4 +43,9 @@ public class TransformedAppender implements LogAppender {
 	public void accept(LogMessage message) {
 		this.delegate.accept(this.transformer.apply(message));
 	}
+
+	@Override
+	public void close() {
+		this.delegate.close();
+	}
 }

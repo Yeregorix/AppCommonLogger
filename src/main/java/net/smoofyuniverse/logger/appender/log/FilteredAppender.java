@@ -44,4 +44,9 @@ public class FilteredAppender implements LogAppender {
 		if (this.filter.test(message))
 			this.delegate.accept(message);
 	}
+
+	@Override
+	public void close() {
+		this.delegate.close();
+	}
 }

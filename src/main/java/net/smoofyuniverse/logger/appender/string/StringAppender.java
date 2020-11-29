@@ -39,5 +39,5 @@ public interface StringAppender extends Consumer<String>, Closeable {
 	void accept(String message);
 
 	@Override
-	default void close() {}
+	void close();
 }

@@ -96,12 +96,11 @@ public class LoggerFactory {
 		if (name == null)
 			throw new IllegalArgumentException();
 
-		Logger l = this.loggers.get(name);
-		if (l == null) {
-			l = new Logger(this, name);
-			this.loggers.put(name, l);
-		}
-		return l;
+		return this.loggers.computeIfAbsent(name, this::createLogger);
+	}
+
+	protected Logger createLogger(String name) {
+		return new Logger(this, name);
 	}
 
 	/**

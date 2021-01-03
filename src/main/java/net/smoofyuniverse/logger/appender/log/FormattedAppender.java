@@ -23,6 +23,7 @@
 package net.smoofyuniverse.logger.appender.log;
 
 import net.smoofyuniverse.logger.appender.string.StringAppender;
+import net.smoofyuniverse.logger.core.DefaultImpl;
 import net.smoofyuniverse.logger.core.LogMessage;
 
 import java.util.function.Function;
@@ -30,6 +31,10 @@ import java.util.function.Function;
 public class FormattedAppender implements LogAppender {
 	public final StringAppender stringAppender;
 	public final Function<LogMessage, String> formatter;
+
+	public FormattedAppender(StringAppender stringAppender) {
+		this(stringAppender, DefaultImpl::formatLog);
+	}
 
 	public FormattedAppender(StringAppender stringAppender, Function<LogMessage, String> formatter) {
 		if (stringAppender == null)

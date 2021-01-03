@@ -22,8 +22,6 @@
 
 package net.smoofyuniverse.logger.core;
 
-import net.smoofyuniverse.logger.appender.log.LogAppender;
-
 import java.util.Optional;
 
 /**
@@ -31,33 +29,16 @@ import java.util.Optional;
  */
 public final class Logger implements ILogger {
 	private final LoggerFactory factory;
-	private final LogAppender appender;
 	private final String name;
 	private LogLevel level;
 
-	protected Logger(LoggerFactory factory, String name) {
+	Logger(LoggerFactory factory, String name) {
 		if (factory == null)
 			throw new IllegalArgumentException("factory");
 		if (name == null)
 			throw new IllegalArgumentException("name");
 
 		this.factory = factory;
-		this.appender = factory.getAppender();
-		this.name = name;
-	}
-
-	/**
-	 * Creates a standalone logger.
-	 *
-	 * @param appender The log appender.
-	 * @param name     The name.
-	 */
-	public Logger(LogAppender appender, String name) {
-		if (appender == null || name == null)
-			throw new IllegalArgumentException();
-
-		this.factory = null;
-		this.appender = appender;
 		this.name = name;
 	}
 
@@ -84,14 +65,24 @@ public final class Logger implements ILogger {
 	 *
 	 * @return The factory.
 	 */
-	public Optional<LoggerFactory> getFactory() {
-		return Optional.ofNullable(this.factory);
+	public LoggerFactory getFactory() {
+		return this.factory;
+	}
+
+	/**
+	 * Gets the logger for the given name using the default factory.
+	 *
+	 * @param name The name.
+	 * @return The logger.
+	 */
+	public static Logger get(String name) {
+		return DefaultImpl.FACTORY.provideLogger(name);
 	}
 
 	@Override
 	public boolean isActive(LogLevel level) {
 		if (this.level == null)
-			return this.factory == null || this.factory.isActive(level);
+			return this.factory.isActive(level);
 		return level.ordinal() >= this.level.ordinal();
 	}
 
@@ -103,6 +94,8 @@ public final class Logger implements ILogger {
 	@Override
 	public void log(LogMessage message) {
 		if (isActive(message.level))
-			this.appender.accept(message);
+			this.factory.getAppender().accept(message);
 	}
+
+
 }

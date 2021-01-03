@@ -32,21 +32,11 @@ import java.util.concurrent.ConcurrentHashMap;
 /**
  * A logger factory.
  */
-public class LoggerFactory {
+public final class LoggerFactory {
 	private final Map<String, Logger> loggers = new ConcurrentHashMap<>(), unmodifiableLoggers = Collections.unmodifiableMap(this.loggers);
-	private final LogAppender appender;
-	private LogLevel level = LogLevel.TRACE;
 
-	/**
-	 * Creates a logger factory.
-	 *
-	 * @param appender The log appender.
-	 */
-	public LoggerFactory(LogAppender appender) {
-		if (appender == null)
-			throw new IllegalArgumentException("appender");
-		this.appender = appender;
-	}
+	private LogAppender appender = DefaultImpl.FORMATTED_SYSTEM_APPENDER;
+	private LogLevel level = LogLevel.TRACE;
 
 	/**
 	 * Gets the level.
@@ -63,6 +53,8 @@ public class LoggerFactory {
 	 * @param level The level.
 	 */
 	public void setLevel(LogLevel level) {
+		if (level == null)
+			throw new IllegalArgumentException("level");
 		this.level = level;
 	}
 
@@ -86,6 +78,17 @@ public class LoggerFactory {
 	}
 
 	/**
+	 * Sets the appender.
+	 *
+	 * @param appender The appender.
+	 */
+	public void setAppender(LogAppender appender) {
+		if (appender == null)
+			throw new IllegalArgumentException("appender");
+		this.appender = appender;
+	}
+
+	/**
 	 * Gets the logger for the given name.
 	 * Creates it if needed.
 	 *
@@ -99,7 +102,7 @@ public class LoggerFactory {
 		return this.loggers.computeIfAbsent(name, this::createLogger);
 	}
 
-	protected Logger createLogger(String name) {
+	private Logger createLogger(String name) {
 		return new Logger(this, name);
 	}
 

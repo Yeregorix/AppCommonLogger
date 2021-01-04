@@ -25,7 +25,7 @@ package net.smoofyuniverse.logger.core;
 import java.util.Optional;
 
 /**
- * Default implementation of a {@link Logger}.
+ * The default implementation of a {@link ILogger}.
  */
 public final class Logger implements ILogger {
 	private final LoggerFactory factory;

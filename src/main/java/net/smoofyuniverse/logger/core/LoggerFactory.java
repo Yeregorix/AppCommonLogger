@@ -36,7 +36,7 @@ public final class LoggerFactory {
 	private final Map<String, Logger> loggers = new ConcurrentHashMap<>(), unmodifiableLoggers = Collections.unmodifiableMap(this.loggers);
 
 	private LogAppender appender = DefaultImpl.FORMATTED_SYSTEM_APPENDER;
-	private LogLevel level = LogLevel.TRACE;
+	private LogLevel level = LogLevel.DEBUG;
 
 	/**
 	 * Gets the level.
